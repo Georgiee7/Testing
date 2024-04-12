@@ -1,0 +1,151 @@
+package me.george.testing.pokemon;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import me.george.testing.utils.Utils;
+
+import java.util.EnumSet;
+import java.util.Set;
+
+/**
+ * The available elemental types Pokémon and moves may have.
+ * Created by George K. on 4/12/2024.
+ */
+@AllArgsConstructor
+@Getter
+public enum Element {
+    NORMAL,
+    FIGHTER,
+    GROUND,
+    ROCK,
+    STEEL,
+    FLYING,
+    DRAGON,
+    FIRE,
+    ELECTRIC,
+    WATER,
+    ICE,
+    GRASS,
+    DARK,
+    PSYCHIC,
+    GHOST,
+    BUG,
+    POISON,
+    FAIRY;
+
+    private final Set<Element> effectiveAgainst = EnumSet.noneOf(Element.class);
+    private final Set<Element> weakAgainst = EnumSet.noneOf(Element.class);
+    private final Set<Element> immuneAgainst = EnumSet.noneOf(Element.class);
+
+    static {
+        initializeElementRelationships();
+    }
+
+    private static void initializeElementRelationships() {
+        Element.NORMAL.weakAgainst.addAll(Set.of(Element.ROCK, Element.STEEL));
+        Element.NORMAL.immuneAgainst.add(Element.GHOST);
+
+        Element.FIGHTER.effectiveAgainst.addAll(Set.of(Element.NORMAL, Element.ROCK, Element.STEEL, Element.ICE, Element.DARK));
+        Element.FIGHTER.weakAgainst.addAll(Set.of(Element.FLYING, Element.PSYCHIC, Element.FAIRY));
+
+        Element.GROUND.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.ELECTRIC, Element.POISON, Element.ROCK, Element.STEEL));
+        Element.GROUND.weakAgainst.addAll(Set.of(Element.GRASS, Element.BUG));
+        Element.GROUND.immuneAgainst.add(Element.FLYING);
+
+        Element.ROCK.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.ICE, Element.FLYING, Element.BUG));
+        Element.ROCK.weakAgainst.addAll(Set.of(Element.WATER, Element.GRASS, Element.FIGHTER, Element.GROUND));
+
+        Element.STEEL.effectiveAgainst.addAll(Set.of(Element.ICE, Element.ROCK, Element.FAIRY));
+        Element.STEEL.weakAgainst.addAll(Set.of(Element.FIRE, Element.FIGHTER, Element.GROUND));
+
+        Element.FLYING.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.FIGHTER, Element.BUG));
+        Element.FLYING.weakAgainst.addAll(Set.of(Element.ELECTRIC, Element.ICE, Element.ROCK));
+
+        Element.DRAGON.effectiveAgainst.add(Element.DRAGON);
+        Element.DRAGON.weakAgainst.add(Element.STEEL);
+
+        Element.FIRE.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.ICE, Element.BUG, Element.STEEL));
+        Element.FIRE.weakAgainst.addAll(Set.of(Element.WATER, Element.ROCK, Element.FIRE, Element.DRAGON));
+
+        Element.ELECTRIC.effectiveAgainst.addAll(Set.of(Element.WATER, Element.FLYING));
+        Element.ELECTRIC.weakAgainst.addAll(Set.of(Element.ELECTRIC, Element.GRASS, Element.DRAGON));
+        Element.ELECTRIC.immuneAgainst.add(Element.GROUND);
+
+        Element.WATER.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.GROUND, Element.ROCK));
+        Element.WATER.weakAgainst.addAll(Set.of(Element.GRASS, Element.ELECTRIC));
+
+        Element.ICE.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.GROUND, Element.FLYING, Element.DRAGON));
+        Element.ICE.weakAgainst.addAll(Set.of(Element.FIRE, Element.FIGHTER, Element.ROCK, Element.STEEL));
+
+        Element.GRASS.effectiveAgainst.addAll(Set.of(Element.WATER, Element.GROUND, Element.ROCK));
+        Element.GRASS.weakAgainst.addAll(Set.of(Element.FIRE, Element.GRASS, Element.POISON, Element.FLYING, Element.BUG));
+
+        Element.DARK.effectiveAgainst.addAll(Set.of(Element.PSYCHIC, Element.GHOST));
+        Element.DARK.weakAgainst.addAll(Set.of(Element.FIGHTER, Element.DARK, Element.FAIRY));
+
+        Element.PSYCHIC.effectiveAgainst.addAll(Set.of(Element.FIGHTER, Element.POISON));
+        Element.PSYCHIC.weakAgainst.addAll(Set.of(Element.BUG, Element.GHOST, Element.DARK));
+
+        Element.GHOST.effectiveAgainst.addAll(Set.of(Element.GHOST, Element.PSYCHIC));
+        Element.GHOST.weakAgainst.add(Element.DARK);
+        Element.GHOST.immuneAgainst.add(Element.NORMAL);
+
+        Element.BUG.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.PSYCHIC, Element.DARK));
+        Element.BUG.weakAgainst.addAll(Set.of(Element.FIRE, Element.FIGHTER, Element.FLYING, Element.STEEL));
+
+        Element.POISON.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.FAIRY));
+        Element.POISON.weakAgainst.addAll(Set.of(Element.POISON, Element.GROUND, Element.ROCK, Element.GHOST));
+
+        Element.FAIRY.effectiveAgainst.addAll(Set.of(Element.FIGHTER, Element.DRAGON, Element.DARK));
+        Element.FAIRY.weakAgainst.addAll(Set.of(Element.POISON, Element.STEEL));
+    }
+
+    /**
+     * Gets the display friendly name of the element.
+     *
+     * @return displayFriendlyName
+     */
+    public String getDisplayName() {
+        return Utils.capitalize(name());
+    }
+
+    /**
+     * Whether this element is effective against another type of element.
+     *
+     * @param other The other element in question.
+     * @return isEffective
+     */
+    public boolean isEffectiveAgainst(Element other) {
+        return this.effectiveAgainst.contains(other);
+    }
+
+    /**
+     * Whether this element is weak against another type of element.
+     *
+     * @param other The other element in question.
+     * @return isWeak
+     */
+    public boolean isWeakAgainst(Element other) {
+        return this.weakAgainst.contains(other);
+    }
+
+    /**
+     * Whether this element is immune against another type of element.
+     *
+     * @param other The other element in question.
+     * @return isImmune
+     */
+    public boolean isImmuneAgainst(Element other) {
+        return this.immuneAgainst.contains(other);
+    }
+
+    /**
+     * Whether this element is normal against another type of element.
+     *
+     * @param other The other element in question.
+     * @return isNormal
+     */
+    public boolean isNormalAgainst(Element other) {
+        return this == other || !this.effectiveAgainst.contains(other) && !this.weakAgainst.contains(other);
+    }
+}
