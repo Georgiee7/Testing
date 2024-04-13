@@ -11,8 +11,10 @@ import me.george.testing.pokemon.Element;
 @AllArgsConstructor
 @Getter
 public enum MoveType {
-    FIRE_MOVE(Element.FIRE),
-    WATER_MOVE(Element.WATER);
+    FIRE_MOVE("Fire Move", Element.FIRE, 10),
+    WATER_MOVE("Water Move", Element.WATER, 5);
 
+    private final String name;
     private final Element element;
+    private final int baseDamage;
 }

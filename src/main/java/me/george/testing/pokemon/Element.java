@@ -148,4 +148,34 @@ public enum Element {
     public boolean isNormalAgainst(Element other) {
         return this == other || !this.effectiveAgainst.contains(other) && !this.weakAgainst.contains(other);
     }
+
+    /**
+     * Gets the effectiveness multiplier of this element against another.
+     *
+     * @param other The element to compare to.
+     * @return effectivenessMultiplier
+     */
+    public float getEffectivenessMultiplier(Element other) {
+        if (isEffectiveAgainst(other))
+            return CombatManager.EFFECTIVE_DAMAGE_MULTIPLIER;
+        else if (isWeakAgainst(other))
+            return CombatManager.NOT_EFFECTIVE_DAMAGE_MULTIPLIER;
+        else if (isImmuneFrom(other))
+            return CombatManager.IMMUNE_DAMAGE;
+        else if (isNormalAgainst(other))
+            return CombatManager.NORMAL_DAMAGE_MULTIPLIER;
+
+        return CombatManager.NORMAL_DAMAGE_MULTIPLIER;
+    }
+
+    /**
+     * Gets the effectiveness multiplier of one element against another.
+     *
+     * @param from The element to compare.
+     * @param to The element to compare to.
+     * @return effectivenessMultiplier
+     */
+    public static float getEffectivenessMultiplier(Element from, Element to) {
+        return from.getEffectivenessMultiplier(to);
+    }
 }
