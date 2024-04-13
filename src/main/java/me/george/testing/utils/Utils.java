@@ -1,6 +1,7 @@
 package me.george.testing.utils;
 
 import me.george.testing.Testing;
+import me.george.testing.pokemon.Pokemon;
 
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
@@ -103,5 +104,15 @@ public class Utils {
             Testing.warn("There was an issue formatting the string " + str);
             return str + " (FORMATTING ERROR)";
         }
+    }
+
+    /**
+     * Check if a given level is in the allowed level range of Pokémon.
+     *
+     * @param level The level to check.
+     * @return isValidLevel
+     */
+    public static boolean isValidLevel(int level) {
+        return level > 0 && level <= Pokemon.MAX_LEVEL;
     }
 }

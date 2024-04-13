@@ -3,6 +3,7 @@ package me.george.testing.data.storage.supported;
 import lombok.Getter;
 import me.george.testing.data.storage.DataStore;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,6 +29,24 @@ public class InMemoryCache<K, V> implements DataStore<K, V> {
     @Override
     public void remove(K key) {
         this.cache.remove(key);
+    }
+
+    /**
+     * Gets a collection of the keys.
+     *
+     * @return keys
+     */
+    public Collection<K> getKeys() {
+        return this.cache.keySet();
+    }
+
+    /**
+     * Gets a collection of the values.
+     *
+     * @return values
+     */
+    public Collection<V> getValues() {
+        return this.cache.values();
     }
 
     /**

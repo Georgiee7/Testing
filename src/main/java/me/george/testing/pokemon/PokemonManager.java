@@ -6,6 +6,7 @@ import me.george.testing.manager.Manager;
 import me.george.testing.pokemon.stats.PermanentStats;
 import me.george.testing.utils.Utils;
 
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -61,5 +62,14 @@ public class PokemonManager extends Manager {
      */
     public static void removePokemon(UUID id) {
         POKEMON_BY_UUID.remove(id);
+    }
+
+    /**
+     * Gets all active cached Pokémon.
+     *
+     * @return activeCachedPokémon
+     */
+    public static Collection<Pokemon> getPokemons() {
+        return POKEMON_BY_UUID.getValues();
     }
 }

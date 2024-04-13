@@ -1,6 +1,7 @@
 package me.george.testing.pokemon;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.george.testing.pokemon.stats.PermanentStat;
 import me.george.testing.pokemon.stats.PermanentStats;
 
@@ -15,18 +16,31 @@ import java.util.stream.Collectors;
 @Getter
 public abstract class Pokemon {
 
+    public static final int MAX_LEVEL = 100;
+    private static final int[] CACHED_EXP_REQUIREMENT = new int[MAX_LEVEL];
+
     private final UUID uuid;
 
     private final PokemonType type;
     private final PermanentStats permanentStats;
 
+    @Setter
+    private String name;
+
+    @Setter
     private int exp;
+
+    @Setter
     private int level;
 
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         this.uuid = UUID.randomUUID();
         this.type = type;
         this.permanentStats = permanentStats == null ? new PermanentStats() : permanentStats;
+
+        setName(type.getName()); // Should be overwritten in case of a custom display name.
+        setExp(0);
+        setLevel(1);
     }
 
     protected Pokemon(PokemonType type) {
@@ -88,28 +102,63 @@ public abstract class Pokemon {
     }
 
     /**
-     * Gives exp to this Pokémon, will proc level-up.
+     * Gives exp to this Pokémon, can proc level-up.
      *
      * @param exp The exp to give.
      */
     public void addExp(int exp) {
-        // TODO
+        if (isMaxLevel() || exp <= 0)
+            return;
+
+        setExp(this.exp + exp);
+        while (this.exp >= getNeededExp() && !(isMaxLevel()))
+            levelUp();
     }
 
     /**
      * Makes this Pokémon level up if below the max level.
      */
     public void levelUp() {
-        // TODO
+        setExp(getExp() - getNeededExp());
+        setLevel(this.level + 1);
     }
 
     /**
-     * Sets the level of this Pokémon.
+     * Returns the amount of exp needed to level up.
      *
-     * @param level The level to set it to.
+     * @return neededExp
      */
-    public void setLevel(int level) {
-        // TODO
+    public int getNeededExp() {
+        return getNeededExp(getLevel());
+    }
+
+    private static int getNeededExp(int level) {
+        // Statically defined exp formula.
+        if (level < 1)
+            level = 1;
+
+        int levelExp = CACHED_EXP_REQUIREMENT[level - 1];
+        if (levelExp > 0)
+            return levelExp;
+
+        if (level > 1) {
+            int lastLevel = level - 1;
+            levelExp = (int) (getNeededExp(lastLevel) + Math.pow(lastLevel, 2) + (lastLevel * 24) + 150);
+        } else {
+            levelExp = 176;
+        }
+
+        CACHED_EXP_REQUIREMENT[level - 1] = levelExp;
+        return levelExp;
+    }
+
+    /**
+     * Whether this Pokémon has reached max level or not.
+     *
+     * @return isMaxLevel
+     */
+    public boolean isMaxLevel() {
+        return this.level >= MAX_LEVEL;
     }
 
     private int getStat(PermanentStat permanentStat) {
@@ -119,8 +168,9 @@ public abstract class Pokemon {
     @Override
     public String toString() {
         return "Pokemon: " + this.type.getName() + "\n" +
-                "Level: " + this.level + "\n" +
-                "Exp: " + this.exp + "\n" +
+                "Name: " + this.name + "\n" +
+                "Level: " + this.level + "/" + MAX_LEVEL + "\n" +
+                "Exp: " + this.exp + "/" + getNeededExp() + "\n" +
                 "Element: " + Arrays.stream(this.type.getElements()).map(Element::getDisplayName).collect(Collectors.joining(", ")) +
                 (this.permanentStats != null ?
                         (

@@ -16,6 +16,7 @@ public class Testing {
         PokemonManager.registerManagers();
 
         Pokemon charmander = PokemonManager.create(PokemonType.CHARMANDER, null);
+        charmander.addExp(5000);
         System.out.println(charmander);
 
         Runtime.getRuntime().addShutdownHook(new Thread(Manager::disableManagers));
