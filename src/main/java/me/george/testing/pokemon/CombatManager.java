@@ -40,13 +40,11 @@ public class CombatManager extends Manager {
      * @return elementalEffectivenessModifier
      */
     public float calculateEffectivenessModifier(Element element, Element[] elements) {
-        float modifier = NORMAL_DAMAGE_MULTIPLIER;
+        // This approach automatically handles double effectiveness & double weakness.
+        float currentModifier = 0;
         for (Element e : elements)
-            modifier *= element.getEffectivenessMultiplier(element);
+            currentModifier += element.getEffectivenessMultiplier(e);
 
-        // TODO: Deal with doubly effective and doubly weak modifiers.
-        // TODO: Deal with STAB modifier.
-
-        return modifier;
+        return NORMAL_DAMAGE_MULTIPLIER * currentModifier;
     }
 }
