@@ -26,14 +26,14 @@ public class Manager {
      * Method to be called when the program starts.
      */
     public void onStart() {
-
+        log("Enabling...");
     }
 
     /**
      * Method to be called when the program shuts down.
      */
     public void onStop() {
-
+        log("Disabling...");
     }
 
     /**
@@ -101,5 +101,15 @@ public class Manager {
      */
     public String getName() {
         return getClass().getSimpleName();
+    }
+
+    /**
+     * Logs a message as this manager.
+     *
+     * @param message The message to log.
+     * @param args The optional arguments to format the message with.
+     */
+    public void log(String message, Object... args) {
+        Testing.logInfo(getName() + " - " + message, args);
     }
 }

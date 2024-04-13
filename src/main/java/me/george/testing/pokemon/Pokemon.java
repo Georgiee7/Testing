@@ -108,6 +108,10 @@ public abstract class Pokemon {
         return this.type.getElements();
     }
 
+    private int getStat(PermanentStat permanentStat) {
+        return this.permanentStats.getStat(permanentStat);
+    }
+
     /**
      * Whether this Pokémon is immune to an element.
      *
@@ -206,10 +210,6 @@ public abstract class Pokemon {
      */
     public boolean isMaxLevel() {
         return this.level >= PokemonManager.MAX_LEVEL;
-    }
-
-    private int getStat(PermanentStat permanentStat) {
-        return this.permanentStats.getStat(permanentStat);
     }
 
     @Override

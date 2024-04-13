@@ -19,14 +19,14 @@ public class PokemonManager extends Manager {
 
     public static final int MAX_LEVEL = 100;
 
-    @Override
-    public void onStart() {
-        Testing.logInfo("Pokemon started.");
-    }
+    public static final float SAME_TYPE_ATTACK_BONUS_MULTIPLIER = 1.5F;
+    public static final float EFFECTIVE_DAMAGE_MULTIPLIER = 2.0F;
+    public static final float DOUBLY_EFFECTIVE_DAMAGE_MULTIPLIER = 4.0F;
+    public static final float NOT_EFFECTIVE_DAMAGE_MULTIPLIER = .5F;
+    public static final float DOUBLY_NOT_EFFECTIVE_DAMAGE_MULTIPLIER = .25F;
 
     @Override
     public void onStop() {
-        Testing.logInfo("Pokemon shutting down...");
         Testing.logInfo("Unloading " + POKEMON_BY_UUID.size() + " Pokemon");
         POKEMON_BY_UUID.clear();
     }
