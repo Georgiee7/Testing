@@ -15,8 +15,8 @@ public class InMemoryCache<K, V> implements DataStore<K, V> {
     private final Map<K, V> cache = new ConcurrentHashMap<>();
 
     @Override
-    public V put(K key, V value) {
-        return this.cache.put(key, value);
+    public void put(K key, V value) {
+        this.cache.put(key, value);
     }
 
     @Override

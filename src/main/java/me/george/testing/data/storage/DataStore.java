@@ -6,7 +6,7 @@ package me.george.testing.data.storage;
  */
 public interface DataStore<K, V> {
 
-    V put(K key, V value);
+    void put(K key, V value);
 
     V get(K key);
 
