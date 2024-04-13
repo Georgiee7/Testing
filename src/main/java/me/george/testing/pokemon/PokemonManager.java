@@ -1,5 +1,6 @@
 package me.george.testing.pokemon;
 
+import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
 import me.george.testing.manager.Manager;
 import me.george.testing.pokemon.stats.PermanentStats;
@@ -11,23 +12,19 @@ import java.util.UUID;
  * Mechanics related to the Pokémon system.
  * Created by George K. on 4/13/2024.
  */
-public class PokemonManager extends Manager<UUID, Pokemon> {
+public class PokemonManager extends Manager {
 
     private static final InMemoryCache<UUID, Pokemon> POKEMON_BY_UUID = new InMemoryCache<>();
 
-    protected PokemonManager() {
-        super(POKEMON_BY_UUID);
-    }
-
     @Override
     public void onStart() {
-        System.out.println("Pokemon started.");
+        Testing.logInfo("Pokemon started.");
     }
 
     @Override
     public void onStop() {
-        System.out.println("Pokemon shutting down...");
-        System.out.println("Unloading " + POKEMON_BY_UUID.size() + " Pokemon");
+        Testing.logInfo("Pokemon shutting down...");
+        Testing.logInfo("Unloading " + POKEMON_BY_UUID.size() + " Pokemon");
         POKEMON_BY_UUID.clear();
     }
 

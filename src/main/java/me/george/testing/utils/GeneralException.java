@@ -1,6 +1,7 @@
 package me.george.testing.utils;
 
 import lombok.Getter;
+import me.george.testing.Testing;
 
 /**
  * A general exception that will throw an alert when thrown.
@@ -30,9 +31,9 @@ public class GeneralException extends RuntimeException {
         this.exception = cause;
 
         try {
-            System.err.println(alert + (cause != null ? " (" + getClass().getSimpleName() + ")" : ""));
+            Testing.logInfo(alert + (cause != null ? " (" + getClass().getSimpleName() + ")" : ""));
         } catch (Throwable th) {
-            System.err.println("WARNING: There was an error broadcasting the fact that there was an error.");
+            Testing.logInfo("WARNING: There was an error broadcasting the fact that there was an error.");
             //noinspection CallToPrintStackTrace
             th.printStackTrace();
         }

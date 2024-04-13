@@ -1,5 +1,7 @@
 package me.george.testing.utils;
 
+import me.george.testing.Testing;
+
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 import java.util.List;
@@ -98,7 +100,7 @@ public class Utils {
         try {
             return String.format(str, args);
         } catch (IllegalFormatException ife) {
-            System.err.println("There was an issue formatting the string " + str);
+            Testing.warn("There was an issue formatting the string " + str);
             return str + " (FORMATTING ERROR)";
         }
     }

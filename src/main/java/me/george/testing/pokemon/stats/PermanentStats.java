@@ -2,6 +2,7 @@ package me.george.testing.pokemon.stats;
 
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,19 +14,29 @@ import java.util.concurrent.ThreadLocalRandom;
 @Getter
 public class PermanentStats {
 
-    public static final int MAX_EV_STATS = 255;
+    public static final int MIN_EV_STAT = 1;
+    public static final int MAX_EV_STAT = 255;
 
     private final Map<PermanentStat, Integer> stats;
+    private boolean areInitialized;
 
     public PermanentStats() {
-        this.stats = new HashMap<>();
+        this(new HashMap<>());
         randomizeStats();
     }
 
     protected PermanentStats(Map<PermanentStat, Integer> stats) {
         this.stats = stats;
+        if (!areInitialized)
+            initializeStats();
     }
 
+    /**
+     * Sets a stat to a specific value.
+     *
+     * @param stat The stat to update.
+     * @param value The value to update it with.
+     */
     public void setStat(PermanentStat stat, int value) {
         this.stats.put(stat, value);
     }
@@ -60,10 +71,12 @@ public class PermanentStats {
         this.stats.put(stat, getStat(stat) - value);
     }
 
-    /**
-     * Randomizes all stats.
-     */
-    public void randomizeStats() {
-        this.stats.replaceAll((stat, value) -> ThreadLocalRandom.current().nextInt(MAX_EV_STATS + 1));
+    private void initializeStats() {
+        Arrays.stream(PermanentStat.values()).forEach(stat -> this.stats.put(stat, MIN_EV_STAT));
+        this.areInitialized = true;
+    }
+
+    private void randomizeStats() {
+        this.stats.replaceAll((stat, value) -> ThreadLocalRandom.current().nextInt(MAX_EV_STAT + 1));
     }
 }

@@ -26,15 +26,65 @@ public abstract class Pokemon {
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         this.uuid = UUID.randomUUID();
         this.type = type;
-        this.permanentStats = permanentStats;
+        this.permanentStats = permanentStats == null ? new PermanentStats() : permanentStats;
     }
 
     protected Pokemon(PokemonType type) {
         this(type, new PermanentStats());
     }
 
-    public int getStat(PermanentStat permanentStat) {
-        return this.permanentStats.getStat(permanentStat);
+    /**
+     * Gets this Pokémon's health.
+     *
+     * @return hp
+     */
+    public int getHP() {
+        return getStat(PermanentStat.HP);
+    }
+
+    /**
+     * Gets this Pokémon's attack.
+     *
+     * @return attack
+     */
+    public int getAttack() {
+        return getStat(PermanentStat.ATK);
+    }
+
+    /**
+     * Gets this Pokémon's special attack.
+     *
+     * @return specialAttack
+     */
+    public int getSpAttack() {
+        return getStat(PermanentStat.SP_ATK);
+    }
+
+    /**
+     * Gets this Pokémon's defense.
+     *
+     * @return defense
+     */
+    public int getDefense() {
+        return getStat(PermanentStat.DEF);
+    }
+
+    /**
+     * Gets this Pokémon's special defense.
+     *
+     * @return specialDefense
+     */
+    public int getSpDefense() {
+        return getStat(PermanentStat.SP_DEF);
+    }
+
+    /**
+     * Gets this Pokémon's speed.
+     *
+     * @return speed
+     */
+    public int getSpeed() {
+        return getStat(PermanentStat.SPEED);
     }
 
     /**
@@ -62,44 +112,8 @@ public abstract class Pokemon {
         // TODO
     }
 
-    /**
-     * Whether this Pokémon is weak against another (type) of Pokémon.
-     *
-     * @param other The Pokémon in question.
-     * @return isWeakAgainst
-     */
-    public boolean isWeakAgainst(Pokemon other) {
-        return this.type.isWeakAgainst(other.getType());
-    }
-
-    /**
-     * Whether this Pokémon is immune from the attacks of another (type) of Pokémon.
-     *
-     * @param other The Pokémon in question.
-     * @return isWeakAgainst
-     */
-    public boolean isImmuneFrom(Pokemon other) {
-        return this.type.isImmuneAgainst(other.getType());
-    }
-
-    /**
-     * Whether this Pokémon is effective against another (type) of Pokémon.
-     *
-     * @param other The Pokémon in question.
-     * @return isWeakAgainst
-     */
-    public boolean isEffectiveAgainst(Pokemon other) {
-        return this.type.isEffectiveAgainst(other.getType());
-    }
-
-    /**
-     * Whether this Pokémon's attack behave normally against another (type) of Pokémon.
-     *
-     * @param other The Pokémon in question.
-     * @return isWeakAgainst
-     */
-    public boolean isNormalAgainst(Pokemon other) {
-        return this.type.isNormalAgainst(other.getType());
+    private int getStat(PermanentStat permanentStat) {
+        return this.permanentStats.getStat(permanentStat);
     }
 
     @Override
@@ -110,10 +124,14 @@ public abstract class Pokemon {
                 "Element: " + Arrays.stream(this.type.getElements()).map(Element::getDisplayName).collect(Collectors.joining(", ")) +
                 (this.permanentStats != null ?
                         (
-                        "\n" +
-                        "--------" + "\n" +
-                        "Stats: " + this.permanentStats.getStats().entrySet().stream().map(stat -> stat.getKey().getDisplayName() + ": " + stat.getValue()).collect(Collectors.joining("\n"))
+                                "\n" +
+                                        "--------" + "\n" +
+                                        "Stats: " + "\n"
+                                        + this.permanentStats.getStats().entrySet()
+                                        .stream()
+                                        .map(stat -> stat.getKey().getDisplayName() + ": " + stat.getValue())
+                                        .collect(Collectors.joining("\n"))
                         ) :
-               "");
+                        "");
     }
 }

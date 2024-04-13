@@ -1,15 +1,16 @@
 package me.george.testing.data.storage.supported;
 
+import lombok.Getter;
 import me.george.testing.data.storage.DataStore;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 /**
  * Represents an in-memory storage (cache) that is key-value separated.
  * Created by George K. on 4/13/2024.
  */
+@Getter
 public class InMemoryCache<K, V> implements DataStore<K, V> {
 
     private final Map<K, V> cache = new ConcurrentHashMap<>();
@@ -36,15 +37,6 @@ public class InMemoryCache<K, V> implements DataStore<K, V> {
      */
     public int size() {
         return this.cache.size();
-    }
-
-    /**
-     * Returns a stream of the cache (map).
-     *
-     * @return cacheStream
-     */
-    public Stream<Map<K, V>> stream() {
-        return Stream.of(this.cache);
     }
 
     /**

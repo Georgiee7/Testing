@@ -35,7 +35,7 @@ public enum Element {
 
     private final Set<Element> effectiveAgainst = new HashSet<>();
     private final Set<Element> weakAgainst = new HashSet<>();
-    private final Set<Element> immuneAgainst = new HashSet<>();
+    private final Set<Element> immuneFrom = new HashSet<>();
 
     static {
         initializeElementRelationships();
@@ -43,14 +43,14 @@ public enum Element {
 
     private static void initializeElementRelationships() {
         Element.NORMAL.weakAgainst.addAll(Set.of(Element.ROCK, Element.STEEL));
-        Element.NORMAL.immuneAgainst.add(Element.GHOST);
+        Element.NORMAL.immuneFrom.add(Element.GHOST);
 
         Element.FIGHTER.effectiveAgainst.addAll(Set.of(Element.NORMAL, Element.ROCK, Element.STEEL, Element.ICE, Element.DARK));
         Element.FIGHTER.weakAgainst.addAll(Set.of(Element.FLYING, Element.PSYCHIC, Element.FAIRY));
 
         Element.GROUND.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.ELECTRIC, Element.POISON, Element.ROCK, Element.STEEL));
         Element.GROUND.weakAgainst.addAll(Set.of(Element.GRASS, Element.BUG));
-        Element.GROUND.immuneAgainst.add(Element.FLYING);
+        Element.GROUND.immuneFrom.add(Element.FLYING);
 
         Element.ROCK.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.ICE, Element.FLYING, Element.BUG));
         Element.ROCK.weakAgainst.addAll(Set.of(Element.WATER, Element.GRASS, Element.FIGHTER, Element.GROUND));
@@ -69,7 +69,7 @@ public enum Element {
 
         Element.ELECTRIC.effectiveAgainst.addAll(Set.of(Element.WATER, Element.FLYING));
         Element.ELECTRIC.weakAgainst.addAll(Set.of(Element.ELECTRIC, Element.GRASS, Element.DRAGON));
-        Element.ELECTRIC.immuneAgainst.add(Element.GROUND);
+        Element.ELECTRIC.immuneFrom.add(Element.GROUND);
 
         Element.WATER.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.GROUND, Element.ROCK));
         Element.WATER.weakAgainst.addAll(Set.of(Element.GRASS, Element.ELECTRIC));
@@ -88,7 +88,7 @@ public enum Element {
 
         Element.GHOST.effectiveAgainst.addAll(Set.of(Element.GHOST, Element.PSYCHIC));
         Element.GHOST.weakAgainst.add(Element.DARK);
-        Element.GHOST.immuneAgainst.add(Element.NORMAL);
+        Element.GHOST.immuneFrom.add(Element.NORMAL);
 
         Element.BUG.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.PSYCHIC, Element.DARK));
         Element.BUG.weakAgainst.addAll(Set.of(Element.FIRE, Element.FIGHTER, Element.FLYING, Element.STEEL));
@@ -135,8 +135,8 @@ public enum Element {
      * @param other The other element in question.
      * @return isImmune
      */
-    public boolean isImmuneAgainst(Element other) {
-        return this.immuneAgainst.contains(other);
+    public boolean isImmuneFrom(Element other) {
+        return this.immuneFrom.contains(other);
     }
 
     /**
