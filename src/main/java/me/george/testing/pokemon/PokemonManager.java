@@ -17,6 +17,8 @@ public class PokemonManager extends Manager {
 
     private static final InMemoryCache<UUID, Pokemon> POKEMON_BY_UUID = new InMemoryCache<>();
 
+    public static final int MAX_LEVEL = 100;
+
     @Override
     public void onStart() {
         Testing.logInfo("Pokemon started.");

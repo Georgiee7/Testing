@@ -15,9 +15,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 public abstract class Pokemon {
-
-    public static final int MAX_LEVEL = 100;
-    private static final int[] CACHED_EXP_REQUIREMENT = new int[MAX_LEVEL];
+    private static final int[] CACHED_EXP_REQUIREMENT = new int[PokemonManager.MAX_LEVEL];
 
     private final UUID uuid;
 
@@ -102,6 +100,55 @@ public abstract class Pokemon {
     }
 
     /**
+     * Gets the Pokémon's elements based on its type.
+     *
+     * @return elements
+     */
+    public Element[] getElements() {
+        return this.type.getElements();
+    }
+
+    /**
+     * Whether this Pokémon is immune to an element.
+     *
+     * @param element The element in question.
+     * @return isImmuneToElement
+     */
+    public boolean isImmuneTo(Element element) {
+        return Arrays.stream(getElements()).anyMatch(e -> e.isImmuneFrom(element));
+    }
+
+    /**
+     * Whether this Pokémon is effective against an element.
+     *
+     * @param element The element in question.
+     * @return isEffectiveAgainstElement
+     */
+    public boolean isEffectiveAgainst(Element element) {
+        return Arrays.stream(getElements()).anyMatch(e -> e.isEffectiveAgainst(element));
+    }
+
+    /**
+     * Whether this Pokémon is weak against an element.
+     *
+     * @param element The element in question.
+     * @return isWeakAgainstElement
+     */
+    public boolean isWeakAgainst(Element element) {
+        return Arrays.stream(getElements()).anyMatch(e -> isWeakAgainst(element));
+    }
+
+    /**
+     * Whether this Pokémon is normal against an element.
+     *
+     * @param element The element in question.
+     * @return isNormalAgainstElement
+     */
+    public boolean isNormalAgainst(Element element) {
+        return Arrays.stream(getElements()).anyMatch(e -> isNormalAgainst(element));
+    }
+
+    /**
      * Gives exp to this Pokémon, can proc level-up.
      *
      * @param exp The exp to give.
@@ -158,7 +205,7 @@ public abstract class Pokemon {
      * @return isMaxLevel
      */
     public boolean isMaxLevel() {
-        return this.level >= MAX_LEVEL;
+        return this.level >= PokemonManager.MAX_LEVEL;
     }
 
     private int getStat(PermanentStat permanentStat) {
@@ -169,7 +216,7 @@ public abstract class Pokemon {
     public String toString() {
         return "Pokemon: " + this.type.getName() + "\n" +
                 "Name: " + this.name + "\n" +
-                "Level: " + this.level + "/" + MAX_LEVEL + "\n" +
+                "Level: " + this.level + "/" + PokemonManager.MAX_LEVEL + "\n" +
                 "Exp: " + this.exp + "/" + getNeededExp() + "\n" +
                 "Element: " + Arrays.stream(this.type.getElements()).map(Element::getDisplayName).collect(Collectors.joining(", ")) +
                 (this.permanentStats != null ?

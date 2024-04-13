@@ -1,7 +1,7 @@
 package me.george.testing.utils;
 
 import me.george.testing.Testing;
-import me.george.testing.pokemon.Pokemon;
+import me.george.testing.pokemon.PokemonManager;
 
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
@@ -113,6 +113,6 @@ public class Utils {
      * @return isValidLevel
      */
     public static boolean isValidLevel(int level) {
-        return level > 0 && level <= Pokemon.MAX_LEVEL;
+        return level > 0 && level <= PokemonManager.MAX_LEVEL;
     }
 }
