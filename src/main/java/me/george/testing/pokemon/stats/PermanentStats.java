@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * A wrapper around permament stats a Pokémon may have.
+ * A wrapper around permanent stats a Pokémon may have.
  * Created by George K. on 4/13/2024.
  */
 @Getter
@@ -22,7 +22,7 @@ public class PermanentStats {
         randomizeStats();
     }
 
-    public PermanentStats(Map<PermanentStat, Integer> stats) {
+    protected PermanentStats(Map<PermanentStat, Integer> stats) {
         this.stats = stats;
     }
 
@@ -32,16 +32,18 @@ public class PermanentStats {
 
     /**
      * Gets a specific stat's value
+     *
      * @param stat The stat to get the value of.
      * @return statValue
      */
     public int getStat(PermanentStat stat) {
         return this.stats.getOrDefault(stat, 0);
     }
-    
+
     /**
      * Increases a specific stat by a value, up to its maximum.
-     * @param stat The stat to increase.
+     *
+     * @param stat  The stat to increase.
      * @param value The value to increase it by.
      */
     public void increaseStat(PermanentStat stat, int value) {
@@ -50,7 +52,8 @@ public class PermanentStats {
 
     /**
      * Decreases a specific stat by a value, up to 0.
-     * @param stat The stat to decrease.
+     *
+     * @param stat  The stat to decrease.
      * @param value The value to decrease it by.
      */
     public void decreaseStat(PermanentStat stat, int value) {

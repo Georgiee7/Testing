@@ -1,9 +1,68 @@
 package me.george.testing.pokemon;
 
+import me.george.testing.data.storage.supported.InMemoryCache;
+import me.george.testing.manager.Manager;
+import me.george.testing.pokemon.stats.PermanentStats;
+import me.george.testing.utils.Utils;
+
+import java.util.UUID;
+
 /**
  * Mechanics related to the Pokémon system.
  * Created by George K. on 4/13/2024.
  */
-public class PokemonManager {
+public class PokemonManager extends Manager<UUID, Pokemon> {
 
+    private static final InMemoryCache<UUID, Pokemon> POKEMON_BY_UUID = new InMemoryCache<>();
+
+    protected PokemonManager() {
+        super(POKEMON_BY_UUID);
+    }
+
+    @Override
+    public void onStart() {
+        System.out.println("Pokemon started.");
+    }
+
+    @Override
+    public void onStop() {
+        System.out.println("Pokemon shutting down...");
+        System.out.println("Unloading " + POKEMON_BY_UUID.size() + " Pokemon");
+        POKEMON_BY_UUID.clear();
+    }
+
+    /**
+     * Creates and returns a new Pokémon.
+     *
+     * @param type  The type of Pokémon to create.
+     * @param stats The stats it should have, if any.
+     * @return newPokemon
+     */
+    public static Pokemon create(PokemonType type, PermanentStats stats) {
+        Utils.verifyNotNull(type, "Tried to create a pokemon with an invalid type!");
+        Utils.verifyNotNull(type.getMaker(), "Tried to create pokemon: '" + type.getName() + "' which has an invalid/null maker!");
+
+        Pokemon pokemon = type.getMaker().apply(stats);
+        POKEMON_BY_UUID.put(pokemon.getUuid(), pokemon);
+        return pokemon;
+    }
+
+    /**
+     * Gets a Pokémon by its id, or null if one does not exist.
+     *
+     * @param id The id to search for.
+     * @return pokemonById
+     */
+    public static Pokemon getPokemon(UUID id) {
+        return POKEMON_BY_UUID.get(id);
+    }
+
+    /**
+     * Removes a pokemon by its id.
+     *
+     * @param id The id to search for.
+     */
+    public static void removePokemon(UUID id) {
+        POKEMON_BY_UUID.remove(id);
+    }
 }

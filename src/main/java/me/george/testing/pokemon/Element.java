@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.george.testing.utils.Utils;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -33,9 +33,9 @@ public enum Element {
     POISON,
     FAIRY;
 
-    private final Set<Element> effectiveAgainst = EnumSet.noneOf(Element.class);
-    private final Set<Element> weakAgainst = EnumSet.noneOf(Element.class);
-    private final Set<Element> immuneAgainst = EnumSet.noneOf(Element.class);
+    private final Set<Element> effectiveAgainst = new HashSet<>();
+    private final Set<Element> weakAgainst = new HashSet<>();
+    private final Set<Element> immuneAgainst = new HashSet<>();
 
     static {
         initializeElementRelationships();

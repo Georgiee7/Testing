@@ -1,9 +1,14 @@
 package me.george.testing.animals;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Represents an animal object.
  * Created by George K. on 4/12/2024.
  */
+@Setter
+@Getter
 public abstract class Animal {
 
     private static final String NO_NAME_PLACEHOLDER = "No name";
@@ -15,22 +20,6 @@ public abstract class Animal {
     }
 
     public Animal(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Gets the name of the animal.
-     * @return animalName
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Changes the name of the animal.
-     * @param name The name to set.
-     */
-    public void setName(String name) {
         this.name = name;
     }
 
