@@ -24,6 +24,7 @@ public class PokemonManager extends Manager {
     public static final float DOUBLY_EFFECTIVE_DAMAGE_MULTIPLIER = 4.0F;
     public static final float NOT_EFFECTIVE_DAMAGE_MULTIPLIER = .5F;
     public static final float DOUBLY_NOT_EFFECTIVE_DAMAGE_MULTIPLIER = .25F;
+    public static final float IMMUNE_DAMAGE = 0F;
 
     @Override
     public void onStop() {
