@@ -40,6 +40,8 @@ public class Manager {
      */
     private static void register() {
         addManager(PokemonManager.class);
+        addManager(CombatManager.class);
+        addManager(BattleManager.class);
     }
 
     /**

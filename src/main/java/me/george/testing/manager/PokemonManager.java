@@ -23,7 +23,8 @@ public class PokemonManager extends Manager {
 
     @Override
     public void onStop() {
-        Testing.logInfo("Unloading " + POKEMON_BY_UUID.size() + " Pokemon");
+        super.onStop();
+        Testing.logInfo("Unloading %d Pokemon", POKEMON_BY_UUID.size());
         POKEMON_BY_UUID.clear();
     }
 

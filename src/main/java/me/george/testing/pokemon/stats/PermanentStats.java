@@ -27,6 +27,7 @@ public class PermanentStats {
 
     protected PermanentStats(Map<PermanentStat, Integer> stats) {
         this.stats = stats;
+        this.initialized = !stats.isEmpty();
         if (!initialized)
             initializeStats();
     }

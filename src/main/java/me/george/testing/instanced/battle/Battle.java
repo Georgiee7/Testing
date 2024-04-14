@@ -25,44 +25,50 @@ public class Battle implements InstancedScenario {
     private final List<Party> parties;
 
     @Setter
-    private boolean paused;
-
-    @Setter
-    private boolean finished;
+    private State state;
 
     private Party winner;
+
+    @Setter
+    private boolean draw;
 
     public Battle(Collection<Party> parties) {
         this.uuid = UUID.randomUUID();
         this.parties = (List<Party>) parties;
+        this.draw = false;
         start();
     }
 
     @Override
     public void start() {
         log("Started battle between the parties of: " + this.parties.stream().map(party -> party.getLeader().getName()).collect(Collectors.joining(", ")));
-        this.paused = false;
-        this.finished = false;
+        setState(State.ACTIVE);
     }
 
     @Override
     public void pause() {
-        this.paused = true;
+        setState(State.PAUSED);
         log("Battle paused.");
     }
 
     @Override
     public void unpause() {
-        this.paused = false;
+        setState(State.ACTIVE);
         log("Battle unpaused.");
     }
 
     @Override
     public void finish() {
-        this.paused = false;
         this.winner = calculateWinner();
-        this.finished = true;
-        log("Battle finished with winning party: " + this.winner.getPlayers().stream().map(Player::getName).collect(Collectors.joining(", ")));
+
+        if (winner == null)
+            this.draw = true;
+
+        setState(State.FINISHED);
+        log(!this.draw ? "Battle finished with winning party: " + this.winner.getPlayers().stream()
+                .map(Player::getName)
+                .collect(Collectors.joining(", "))
+                : "The battle ended in a draw.");
     }
 
     /**
@@ -86,9 +92,52 @@ public class Battle implements InstancedScenario {
      * Logs a message as this battle, handled.
      *
      * @param message The message to log.
-     * @param args The arguments to format the message with.
+     * @param args    The arguments to format the message with.
      */
     protected void log(String message, Object... args) {
         Manager.getInstance(BattleManager.class).log(message, args);
+    }
+
+    /**
+     * Whether the battle is in a specific state.
+     *
+     * @param state The state to check.
+     * @return isInState
+     */
+    public boolean isState(State state) {
+        return this.state == state;
+    }
+
+    /**
+     * Whether the battle is active or not.
+     *
+     * @return battleIsActive
+     */
+    public boolean isActive() {
+        return isState(State.ACTIVE);
+    }
+
+    /**
+     * Whether the battle is paused or not.
+     *
+     * @return battleIsPaused
+     */
+    public boolean isPaused() {
+        return isState(State.PAUSED);
+    }
+
+    /**
+     * Whether the battle is finished or not.
+     *
+     * @return battleIsFinished
+     */
+    public boolean isFinished() {
+        return isState(State.FINISHED);
+    }
+
+    public enum State {
+        ACTIVE,
+        PAUSED,
+        FINISHED
     }
 }

@@ -21,6 +21,9 @@ public abstract class Move {
 
     private final Pokemon caster;
 
+    @Setter
+    private float accuracy;
+
     protected Move(MoveType type, Pokemon caster) {
         this.type = type;
         this.name = type.getName();
@@ -37,8 +40,9 @@ public abstract class Move {
      *
      * @return moveSuccessfullyPerformed
      */
-    public boolean perform() {
+    public final boolean perform() {
         execute();
+        // calculateAccuracy();
         // TODO: Cater to mechanics that may cause a move to fail (randomness involved in moves, lack of skill, etc.).
         return true;
     }

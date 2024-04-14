@@ -75,4 +75,14 @@ public class Player {
     public void unlearn(PokemonType type) {
         this.pokedex.remove(type.getPokedexId(), type);
     }
+
+    /**
+     * Checks whether a player has unlocked a type of Pokémon in their pokedex.
+     *
+     * @param type The type of Pokémon to check.
+     * @return hasUnlockedPokemon
+     */
+    public boolean hasUnlocked(PokemonType type) {
+        return this.pokedex.containsValue(type);
+    }
 }
