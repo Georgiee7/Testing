@@ -2,6 +2,7 @@ package me.george.testing.pokemon;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import me.george.testing.manager.CombatManager;
 import me.george.testing.utils.Utils;
 
 import java.util.HashSet;

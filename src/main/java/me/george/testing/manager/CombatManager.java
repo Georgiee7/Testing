@@ -1,6 +1,7 @@
-package me.george.testing.pokemon;
+package me.george.testing.manager;
 
-import me.george.testing.manager.Manager;
+import me.george.testing.pokemon.Element;
+import me.george.testing.pokemon.Pokemon;
 import me.george.testing.pokemon.move.DamageMove;
 import me.george.testing.pokemon.move.Move;
 
@@ -34,17 +35,19 @@ public class CombatManager extends Manager {
 
     /**
      * Calculates the effectiveness modifier of an element against an array of elements.
+     * Automatically handles double (in)effectiveness.
      *
      * @param element  The element to compare.
      * @param elements The elements to compare to.
      * @return elementalEffectivenessModifier
      */
     public float calculateEffectivenessModifier(Element element, Element[] elements) {
-        // This approach automatically handles double effectiveness & double weakness.
-        float currentModifier = 0;
-        for (Element e : elements)
-            currentModifier += element.getEffectivenessMultiplier(e);
+        float effectivenessModifier = NORMAL_DAMAGE_MULTIPLIER;
+        for (Element targetElement : elements) {
+            float multiplier = element.getEffectivenessMultiplier(targetElement);
+            effectivenessModifier *= multiplier;
+        }
 
-        return NORMAL_DAMAGE_MULTIPLIER * currentModifier;
+        return effectivenessModifier;
     }
 }
