@@ -2,7 +2,7 @@ package me.george.testing.pokemon;
 
 import lombok.Getter;
 import me.george.testing.pokemon.stats.PermanentStats;
-import me.george.testing.pokemon.types.Charmander;
+import me.george.testing.pokemon.types.t1.fire.Charmander;
 
 import java.util.function.Function;
 

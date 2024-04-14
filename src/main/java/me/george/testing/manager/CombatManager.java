@@ -27,7 +27,7 @@ public class CombatManager extends Manager {
      * @param pokemon The defending Pokémon.
      * @return calculatedDamage
      */
-    public int calculateDamage(Move move, Pokemon pokemon) {
+    public static int calculateDamage(Move move, Pokemon pokemon) {
         return move instanceof DamageMove
                 ? (int) (((DamageMove) move).getDamage() * calculateEffectivenessModifier(move.getElement(), pokemon.getElements()))
                 : 0;
@@ -41,7 +41,7 @@ public class CombatManager extends Manager {
      * @param elements The elements to compare to.
      * @return elementalEffectivenessModifier
      */
-    public float calculateEffectivenessModifier(Element element, Element[] elements) {
+    public static float calculateEffectivenessModifier(Element element, Element[] elements) {
         float effectivenessModifier = NORMAL_DAMAGE_MULTIPLIER;
         for (Element targetElement : elements) {
             float multiplier = element.getEffectivenessMultiplier(targetElement);

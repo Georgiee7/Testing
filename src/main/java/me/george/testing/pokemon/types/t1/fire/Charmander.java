@@ -1,4 +1,4 @@
-package me.george.testing.pokemon.types;
+package me.george.testing.pokemon.types.t1.fire;
 
 import me.george.testing.pokemon.Pokemon;
 import me.george.testing.pokemon.PokemonType;

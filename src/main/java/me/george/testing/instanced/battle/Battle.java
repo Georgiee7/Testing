@@ -10,6 +10,7 @@ import me.george.testing.manager.Manager;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -18,6 +19,8 @@ import java.util.stream.Collectors;
  */
 @Getter
 public class Battle implements InstancedScenario {
+
+    private final UUID uuid;
 
     private final List<Party> parties;
 
@@ -30,6 +33,7 @@ public class Battle implements InstancedScenario {
     private Party winner;
 
     public Battle(Collection<Party> parties) {
+        this.uuid = UUID.randomUUID();
         this.parties = (List<Party>) parties;
         start();
     }
