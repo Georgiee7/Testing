@@ -13,13 +13,14 @@ import java.util.function.Function;
 @Getter
 public enum PokemonType {
     // Tier 2
-    CHARIZARD("Charizard", 1.7F, 90F, null, evolutionsOf(), Element.FIRE, Element.DRAGON),
+    CHARIZARD(6, "Charizard", 1.7F, 90F, null, evolutionsOf(), Element.FIRE, Element.DRAGON),
 
     // Tier 1
-    CHARMANDER("Charmander", 0.6F, 8.5F, Charmander::new, evolutionsOf(CHARIZARD), Element.FIRE),
-    BULBASAUR("Bulbasaur", 0.7F, 6.9F, null, evolutionsOf(), Element.GRASS, Element.POISON),
-    SQUIRTLE("Squirtle", 0.5F, 9F, null, evolutionsOf(), Element.WATER);
+    CHARMANDER(4, "Charmander", 0.6F, 8.5F, Charmander::new, evolutionsOf(CHARIZARD), Element.FIRE),
+    BULBASAUR(1, "Bulbasaur", 0.7F, 6.9F, null, evolutionsOf(), Element.GRASS, Element.POISON),
+    SQUIRTLE(7, "Squirtle", 0.5F, 9F, null, evolutionsOf(), Element.WATER);
 
+    private final int pokedexId;
     private final String name;
     private final float height; // in meters
     private final float weight; // in kg
@@ -27,7 +28,8 @@ public enum PokemonType {
     private final PokemonType[] evolutions;
     private final Element[] elements;
 
-    PokemonType(String name, float height, float weight, Function<PermanentStats, Pokemon> maker, PokemonType[] evolutions, Element... elements) {
+    PokemonType(int pokedexId, String name, float height, float weight, Function<PermanentStats, Pokemon> maker, PokemonType[] evolutions, Element... elements) {
+        this.pokedexId = pokedexId;
         this.name = name;
         this.height = height;
         this.weight = weight;

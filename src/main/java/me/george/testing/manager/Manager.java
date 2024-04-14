@@ -2,7 +2,6 @@ package me.george.testing.manager;
 
 import lombok.Getter;
 import me.george.testing.Testing;
-import me.george.testing.pokemon.PokemonManager;
 import me.george.testing.utils.ReflectionUtil;
 import me.george.testing.utils.Utils;
 

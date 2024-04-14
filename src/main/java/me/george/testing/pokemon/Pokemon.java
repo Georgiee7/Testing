@@ -2,6 +2,8 @@ package me.george.testing.pokemon;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.george.testing.Player;
+import me.george.testing.manager.PokemonManager;
 import me.george.testing.pokemon.stats.PermanentStat;
 import me.george.testing.pokemon.stats.PermanentStats;
 
@@ -31,6 +33,11 @@ public abstract class Pokemon {
     @Setter
     private int level;
 
+    @Setter private boolean shiny = false;
+
+    @Setter
+    private Player owner;
+
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         this.uuid = UUID.randomUUID();
         this.type = type;
@@ -52,6 +59,36 @@ public abstract class Pokemon {
      */
     public int getHP() {
         return getStat(PermanentStat.HP);
+    }
+
+    /**
+     * Decreases the Pokémon's HP by an amount, may kill it.
+     *
+     * @param amount The amount to decrease it by.
+     */
+    public void decreaseHP(int amount) {
+        this.permanentStats.decreaseStat(PermanentStat.HP, amount);
+        if (getHP() <= 0)
+            kill();
+    }
+
+    /**
+     * Sets the Pokémon's hp to an amount.
+     *
+     * @param amount The amount to set it to.
+     */
+    public void setHP(int amount) {
+        this.permanentStats.setStat(PermanentStat.HP, amount);
+    }
+
+    /**
+     * Kills the Pokémon.
+     */
+    public void kill() {
+        if (isAlive())
+            setHP(0);
+
+        // TODO anything else
     }
 
     /**
@@ -210,6 +247,15 @@ public abstract class Pokemon {
      */
     public boolean isMaxLevel() {
         return this.level >= PokemonManager.MAX_LEVEL;
+    }
+
+    /**
+     * Whether this Pokémon is alive or not.
+     *
+     * @return isAlive
+     */
+    public boolean isAlive() {
+        return getHP() > 0;
     }
 
     @Override

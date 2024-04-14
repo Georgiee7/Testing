@@ -1,7 +1,9 @@
 package me.george.testing.pokemon.move;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.george.testing.pokemon.Element;
+import me.george.testing.pokemon.Pokemon;
 
 /**
  * Represents a move that can be performed by Pokémon, that consists of a particular element.
@@ -14,9 +16,31 @@ public abstract class Move {
 
     private final String name;
 
-    public Move(MoveType type) {
+    @Setter
+    private boolean undodgeable = false;
+
+    private final Pokemon caster;
+
+    protected Move(MoveType type, Pokemon caster) {
         this.type = type;
         this.name = type.getName();
+        this.caster = caster;
+    }
+
+    /**
+     * Executes the mechanics of the move.
+     */
+    protected abstract void execute();
+
+    /**
+     * Attempts to perform the move.
+     *
+     * @return moveSuccessfullyPerformed
+     */
+    public boolean perform() {
+        execute();
+        // TODO: Cater to mechanics that may cause a move to fail (randomness involved in moves, lack of skill, etc.).
+        return true;
     }
 
     /**

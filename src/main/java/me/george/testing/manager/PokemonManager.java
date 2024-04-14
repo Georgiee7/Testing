@@ -1,8 +1,10 @@
-package me.george.testing.pokemon;
+package me.george.testing.manager;
 
+import me.george.testing.Player;
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
-import me.george.testing.manager.Manager;
+import me.george.testing.pokemon.Pokemon;
+import me.george.testing.pokemon.PokemonType;
 import me.george.testing.pokemon.stats.PermanentStats;
 import me.george.testing.utils.Utils;
 
@@ -39,6 +41,22 @@ public class PokemonManager extends Manager {
         Pokemon pokemon = type.getMaker().apply(stats);
         POKEMON_BY_UUID.put(pokemon.getUuid(), pokemon);
         return pokemon;
+    }
+
+    public static void setPokemonOwner(Pokemon pokemon, Player player) {
+        Utils.verifyNotNull(pokemon, "Cannot set the owner of a null pokemon.");
+        Utils.verifyNotNull(player, "Tried to make a null player the owner of a pokemon.");
+
+        pokemon.setOwner(player);
+        player.addPokemon(pokemon);
+    }
+
+    public static void removePokemonOwner(Pokemon pokemon, Player player) {
+        Utils.verifyNotNull(pokemon, "Cannot remove a null pokemon from a player.");
+        Utils.verifyNotNull(player, "Tried to remove a pokemon from a null owner.");
+
+        player.removePokemon(pokemon);
+        pokemon.setOwner(null);
     }
 
     /**

@@ -18,7 +18,7 @@ public class PermanentStats {
     public static final int MAX_EV_STAT = 255;
 
     private final Map<PermanentStat, Integer> stats;
-    private boolean areInitialized;
+    private boolean initialized;
 
     public PermanentStats() {
         this(new HashMap<>());
@@ -27,7 +27,7 @@ public class PermanentStats {
 
     protected PermanentStats(Map<PermanentStat, Integer> stats) {
         this.stats = stats;
-        if (!areInitialized)
+        if (!initialized)
             initializeStats();
     }
 
@@ -73,7 +73,7 @@ public class PermanentStats {
 
     private void initializeStats() {
         Arrays.stream(PermanentStat.values()).forEach(stat -> this.stats.put(stat, MIN_EV_STAT));
-        this.areInitialized = true;
+        this.initialized = true;
     }
 
     private void randomizeStats() {
