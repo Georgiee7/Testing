@@ -1,11 +1,11 @@
 package me.george.testing.instanced.battle;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.Party;
-import me.george.testing.Player;
+import me.george.testing.parties.Party;
+import me.george.testing.player.Player;
 import me.george.testing.instanced.InstancedScenario;
-import me.george.testing.manager.BattleManager;
 import me.george.testing.manager.Manager;
 
 import java.util.Collection;
@@ -24,12 +24,12 @@ public class Battle implements InstancedScenario {
 
     private final List<Party> parties;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private State state;
 
     private Party winner;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private boolean draw;
 
     public Battle(Collection<Party> parties) {
@@ -52,9 +52,9 @@ public class Battle implements InstancedScenario {
     }
 
     @Override
-    public void unpause() {
+    public void resume() {
         setState(State.ACTIVE);
-        log("Battle unpaused.");
+        log("Battle resumed.");
     }
 
     @Override

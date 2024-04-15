@@ -1,9 +1,9 @@
 package me.george.testing.pokemon;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.Player;
-import me.george.testing.manager.PokemonManager;
+import me.george.testing.player.Player;
 import me.george.testing.pokemon.stats.PermanentStat;
 import me.george.testing.pokemon.stats.PermanentStats;
 
@@ -24,18 +24,19 @@ public abstract class Pokemon {
     private final PokemonType type;
     private final PermanentStats permanentStats;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private String name;
 
     @Setter
     private int exp;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private int level;
 
-    @Setter private boolean shiny = false;
+    @Setter(AccessLevel.PROTECTED)
+    private boolean shiny = false;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private Player owner;
 
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {

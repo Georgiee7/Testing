@@ -2,6 +2,10 @@ package me.george.testing.manager;
 
 import lombok.Getter;
 import me.george.testing.Testing;
+import me.george.testing.instanced.battle.BattleManager;
+import me.george.testing.parties.PartyManager;
+import me.george.testing.player.PlayerManager;
+import me.george.testing.pokemon.PokemonManager;
 import me.george.testing.utils.ReflectionUtil;
 import me.george.testing.utils.Utils;
 
@@ -25,14 +29,14 @@ public class Manager {
      * Method to be called when the program starts.
      */
     public void onStart() {
-        log("Enabling...");
+
     }
 
     /**
      * Method to be called when the program shuts down.
      */
     public void onStop() {
-        log("Disabling...");
+
     }
 
     /**
@@ -40,8 +44,10 @@ public class Manager {
      */
     private static void register() {
         addManager(PokemonManager.class);
+        addManager(PlayerManager.class);
         addManager(CombatManager.class);
         addManager(BattleManager.class);
+        addManager(PartyManager.class);
     }
 
     /**
@@ -50,7 +56,11 @@ public class Manager {
     public static void registerManagers() {
         Testing.logInfo("Registering managers...");
         register();
-        getManagers().forEach(Manager::onStart);
+        for (Manager manager : getManagers()) {
+            manager.log("Enabling...");
+            manager.onStart();
+        }
+
         Testing.logInfo("Registered %d managers.", getManagers().size());
     }
 
@@ -59,7 +69,11 @@ public class Manager {
      */
     public static void disableManagers() {
         Testing.logInfo("Disabling managers...");
-        getManagers().forEach(Manager::onStop);
+        for (Manager manager : getManagers()) {
+            manager.log("Disabling...");
+            manager.onStop();
+        }
+
         Testing.logInfo("Managers have been disabled.");
     }
 

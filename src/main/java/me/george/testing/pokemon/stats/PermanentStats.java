@@ -33,23 +33,24 @@ public class PermanentStats {
     }
 
     /**
-     * Sets a stat to a specific value.
-     *
-     * @param stat The stat to update.
-     * @param value The value to update it with.
-     */
-    public void setStat(PermanentStat stat, int value) {
-        this.stats.put(stat, value);
-    }
-
-    /**
      * Gets a specific stat's value
      *
      * @param stat The stat to get the value of.
      * @return statValue
      */
     public int getStat(PermanentStat stat) {
-        return this.stats.getOrDefault(stat, 0);
+        return this.stats.getOrDefault(stat, MIN_EV_STAT);
+    }
+
+    /**
+     * Sets a stat to a specific value.
+     *
+     * @param stat The stat to update.
+     * @param value The value to update it with.
+     */
+    public void setStat(PermanentStat stat, int value) {
+        int newValue = Math.min(value, MAX_EV_STAT);
+        this.stats.put(stat, Math.max(newValue, MIN_EV_STAT));
     }
 
     /**
@@ -59,7 +60,8 @@ public class PermanentStats {
      * @param value The value to increase it by.
      */
     public void increaseStat(PermanentStat stat, int value) {
-        this.stats.put(stat, getStat(stat) + value);
+        int newValue = Math.min(getStat(stat) + value, MAX_EV_STAT);
+        this.stats.put(stat, Math.max(newValue, MIN_EV_STAT));
     }
 
     /**
@@ -69,7 +71,8 @@ public class PermanentStats {
      * @param value The value to decrease it by.
      */
     public void decreaseStat(PermanentStat stat, int value) {
-        this.stats.put(stat, getStat(stat) - value);
+        int newValue = Math.max(getStat(stat) - value, MIN_EV_STAT);
+        this.stats.put(stat, Math.min(newValue, MAX_EV_STAT));
     }
 
     private void initializeStats() {

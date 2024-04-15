@@ -1,9 +1,9 @@
-package me.george.testing.manager;
+package me.george.testing.instanced.battle;
 
 import lombok.Getter;
-import me.george.testing.Party;
+import me.george.testing.parties.Party;
 import me.george.testing.Testing;
-import me.george.testing.instanced.battle.Battle;
+import me.george.testing.manager.Manager;
 import me.george.testing.utils.Utils;
 
 import java.util.Collection;
@@ -23,8 +23,6 @@ public class BattleManager extends Manager {
 
     @Override
     public void onStop() {
-        super.onStop();
-
         Testing.logInfo("Stopping %d battles...", ACTIVE_BATTLES.size());
         ACTIVE_BATTLES.values().forEach(Battle::stop);
     }
@@ -37,6 +35,7 @@ public class BattleManager extends Manager {
     public static void startBattle(Collection<Party> parties) {
         Battle battle = new Battle(parties);
         ACTIVE_BATTLES.put(battle.getUuid(), battle);
+        updateBattle(battle, Battle::start);
     }
 
     /**
@@ -68,7 +67,7 @@ public class BattleManager extends Manager {
      * @param battle The battle to resume.
      */
     public static void resume(Battle battle) {
-        updateBattle(battle, Battle::unpause);
+        updateBattle(battle, Battle::resume);
     }
 
     /**

@@ -1,7 +1,9 @@
-package me.george.testing;
+package me.george.testing.player;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import me.george.testing.parties.Party;
 import me.george.testing.pokemon.Pokemon;
 import me.george.testing.pokemon.PokemonType;
 
@@ -16,17 +18,19 @@ public class Player {
 
     private final UUID uuid;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private String name;
 
     private final List<Pokemon> pokemons;
 
     private final Map<Integer, PokemonType> pokedex;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private Pokemon activePokemon;
 
-    public Player(String name) {
+    private Party party;
+
+    protected Player(String name) {
         this.uuid = UUID.randomUUID();
         this.name = name;
         this.pokemons = new ArrayList<>();
@@ -49,6 +53,16 @@ public class Player {
     public void removePokemon(Pokemon pokemon) {
         despawnActivePokemon();
         this.pokemons.remove(pokemon);
+    }
+
+    /**
+     * Whether a player has a specific Pokémon in their team.
+     *
+     * @param pokemon The Pokémon in question.
+     * @return hasPokemonInTeam
+     */
+    public boolean hasPokemon(Pokemon pokemon) {
+        return this.pokemons.contains(pokemon);
     }
 
     /**
@@ -84,5 +98,21 @@ public class Player {
      */
     public boolean hasUnlocked(PokemonType type) {
         return this.pokedex.containsValue(type);
+    }
+
+    /**
+     * Adds the player to a party.
+     *
+     * @param party The party to add the player to.
+     */
+    public void addToParty(Party party) {
+        this.party = party;
+    }
+
+    /**
+     * Removes the player from their party.
+     */
+    public void removeFromParty() {
+        this.party = null;
     }
 }

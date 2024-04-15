@@ -1,7 +1,7 @@
 package me.george.testing.utils;
 
 import me.george.testing.Testing;
-import me.george.testing.manager.PokemonManager;
+import me.george.testing.pokemon.PokemonManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;

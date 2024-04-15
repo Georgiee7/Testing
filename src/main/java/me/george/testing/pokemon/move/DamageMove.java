@@ -17,8 +17,8 @@ public abstract class DamageMove extends Move {
 
     private Pokemon[] targets;
 
-    protected DamageMove(Pokemon caster, Pokemon... targets) {
-        super(MoveType.FIRE_MOVE, caster);
+    protected DamageMove(MoveType type, Pokemon caster, Pokemon... targets) {
+        super(type, caster);
         this.targets = targets;
         this.damage = getType().getBaseDamage();
     }

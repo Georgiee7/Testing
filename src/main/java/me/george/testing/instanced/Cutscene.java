@@ -17,7 +17,7 @@ public class Cutscene implements InstancedScenario {
     }
 
     @Override
-    public void unpause() {
+    public void resume() {
 
     }
 

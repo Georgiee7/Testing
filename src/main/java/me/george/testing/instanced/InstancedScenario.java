@@ -19,7 +19,7 @@ public interface InstancedScenario {
     /**
      * Called when the scenario instance is continued.
      */
-    void unpause();
+    void resume();
 
     /**
      * Called when the scenario instance is finished.
