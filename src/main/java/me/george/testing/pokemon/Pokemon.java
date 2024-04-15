@@ -44,15 +44,19 @@ public abstract class Pokemon {
     @Setter(AccessLevel.PROTECTED)
     private Player owner;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private int health;
+
+    @Setter(AccessLevel.PROTECTED)
+    private boolean alive;
 
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         this.uuid = UUID.randomUUID();
         this.type = type;
         this.evs = new HashMap<>();
-        setExp(0);
+        this.alive = true;
         setLevel(1);
+        setExp(0);
         this.permanentStats = permanentStats == null ? new PermanentStats(this) : permanentStats;
 
         setName(type.getName()); // Should be overwritten in case of a custom display name.
@@ -77,7 +81,7 @@ public abstract class Pokemon {
      * @param stat   The stat to which EVs should be added.
      * @param amount The amount of EVs to add. Must be a positive integer.
      */
-    public void addEv(PermanentStat stat, int amount) {
+    protected void addEv(PermanentStat stat, int amount) {
         if (amount <= PermanentStats.MIN_EV_AMOUNT)
             return;
 
@@ -92,7 +96,7 @@ public abstract class Pokemon {
     }
 
     /**
-     * Gets this Pokémon's health.
+     * Gets this Pokémon's health stat.
      *
      * @return hp
      */
@@ -107,7 +111,7 @@ public abstract class Pokemon {
      */
     public void decreaseHP(int amount) {
         this.permanentStats.decreaseStat(PermanentStat.HP, amount);
-        if (getHP() <= 0)
+        if (getHealth() <= 0)
             kill();
     }
 
@@ -116,7 +120,7 @@ public abstract class Pokemon {
      *
      * @param amount The amount to set it to.
      */
-    protected void setHP(int amount) {
+    public void setHP(int amount) {
         this.permanentStats.setStat(PermanentStat.HP, amount);
     }
 
@@ -124,8 +128,10 @@ public abstract class Pokemon {
      * Kills the Pokémon.
      */
     public void kill() {
-        if (isAlive())
+        if (isAlive()) {
             this.health = 0;
+            this.alive = false;
+        }
 
         // TODO anything else
     }
@@ -194,7 +200,7 @@ public abstract class Pokemon {
      * @param element The element in question.
      * @return isImmuneToElement
      */
-    public boolean isImmuneTo(Element element) {
+    protected boolean isImmuneTo(Element element) {
         return Arrays.stream(getElements()).anyMatch(e -> e.isImmuneFrom(element));
     }
 
@@ -284,17 +290,8 @@ public abstract class Pokemon {
      *
      * @return isMaxLevel
      */
-    public boolean isMaxLevel() {
+    protected boolean isMaxLevel() {
         return this.level >= PokemonManager.MAX_LEVEL;
-    }
-
-    /**
-     * Whether this Pokémon is alive or not.
-     *
-     * @return isAlive
-     */
-    public boolean isAlive() {
-        return getHP() > 0;
     }
 
     @Override

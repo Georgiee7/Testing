@@ -2,8 +2,8 @@ package me.george.testing.utils;
 
 import me.george.testing.Testing;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Constructor;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

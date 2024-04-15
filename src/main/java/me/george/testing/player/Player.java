@@ -48,6 +48,7 @@ public class Player {
 
     /**
      * Removes a Pokémon from the player's party.
+     *
      * @param pokemon The pokemon to remove.
      */
     public void removePokemon(Pokemon pokemon) {

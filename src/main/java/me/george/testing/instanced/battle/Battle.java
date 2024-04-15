@@ -3,10 +3,10 @@ package me.george.testing.instanced.battle;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.parties.Party;
-import me.george.testing.player.Player;
 import me.george.testing.instanced.InstancedScenario;
 import me.george.testing.manager.Manager;
+import me.george.testing.parties.Party;
+import me.george.testing.player.Player;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,9 +1,9 @@
 package me.george.testing.pokemon;
 
-import me.george.testing.manager.Manager;
-import me.george.testing.player.Player;
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
+import me.george.testing.manager.Manager;
+import me.george.testing.player.Player;
 import me.george.testing.pokemon.stats.PermanentStats;
 import me.george.testing.utils.Utils;
 
@@ -49,7 +49,7 @@ public class PokemonManager extends Manager {
      * Sets a player as a Pokémon's owner.
      *
      * @param pokemon The Pokémon to set the owner of.
-     * @param player The new Pokémon's owner.
+     * @param player  The new Pokémon's owner.
      */
     public static void setPokemonOwner(Pokemon pokemon, Player player) {
         Utils.verifyNotNull(pokemon, "Cannot set the owner of a null pokemon.");
@@ -67,7 +67,7 @@ public class PokemonManager extends Manager {
      * Removes a Pokémon from its owner.
      *
      * @param pokemon The pokemon to remove.
-     * @param player The player to remove the Pokémon from.
+     * @param player  The player to remove the Pokémon from.
      */
     public static void removePokemonOwner(Pokemon pokemon, Player player) {
         Utils.verifyNotNull(pokemon, "Cannot remove a null pokemon from a player.");

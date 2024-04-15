@@ -122,7 +122,7 @@ public class Manager {
      * Logs a message as this manager.
      *
      * @param message The message to log.
-     * @param args The optional arguments to format the message with.
+     * @param args    The optional arguments to format the message with.
      */
     public void log(String message, Object... args) {
         Testing.logInfo(getName() + " - " + message, args);

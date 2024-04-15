@@ -51,7 +51,7 @@ public class PermanentStats {
     /**
      * Sets a stat to a specific value.
      *
-     * @param stat The stat to update.
+     * @param stat  The stat to update.
      * @param value The value to update it with.
      */
     public void setStat(PermanentStat stat, int value) {
