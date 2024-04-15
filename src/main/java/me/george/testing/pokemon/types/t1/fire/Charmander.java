@@ -13,8 +13,4 @@ public class Charmander extends Pokemon {
     public Charmander(PermanentStats permanentStats) {
         super(PokemonType.CHARMANDER, permanentStats);
     }
-
-    public Charmander() {
-        super(PokemonType.CHARMANDER);
-    }
 }

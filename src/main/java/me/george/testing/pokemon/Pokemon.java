@@ -8,6 +8,8 @@ import me.george.testing.pokemon.stats.PermanentStat;
 import me.george.testing.pokemon.stats.PermanentStats;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,9 +27,12 @@ public abstract class Pokemon {
     private final PermanentStats permanentStats;
 
     @Setter(AccessLevel.PROTECTED)
+    private Map<PermanentStat, Integer> evs;
+
+    @Setter(AccessLevel.PROTECTED)
     private String name;
 
-    @Setter
+    @Setter(AccessLevel.PROTECTED)
     private int exp;
 
     @Setter(AccessLevel.PROTECTED)
@@ -42,15 +47,16 @@ public abstract class Pokemon {
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         this.uuid = UUID.randomUUID();
         this.type = type;
-        this.permanentStats = permanentStats == null ? new PermanentStats() : permanentStats;
-
-        setName(type.getName()); // Should be overwritten in case of a custom display name.
+        this.evs = new HashMap<>();
         setExp(0);
         setLevel(1);
+        this.permanentStats = permanentStats == null ? new PermanentStats(this) : permanentStats;
+
+        setName(type.getName()); // Should be overwritten in case of a custom display name.
     }
 
     protected Pokemon(PokemonType type) {
-        this(type, new PermanentStats());
+        this(type, null);
     }
 
     /**
