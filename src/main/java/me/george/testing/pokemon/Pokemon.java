@@ -52,7 +52,7 @@ public abstract class Pokemon {
         this.type = type;
         this.evs = new HashMap<>();
         setExp(0);
-        setLevel(15);
+        setLevel(1);
         this.permanentStats = permanentStats == null ? new PermanentStats(this) : permanentStats;
 
         setName(type.getName()); // Should be overwritten in case of a custom display name.
