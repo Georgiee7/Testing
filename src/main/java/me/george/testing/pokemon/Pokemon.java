@@ -44,12 +44,15 @@ public abstract class Pokemon {
     @Setter(AccessLevel.PROTECTED)
     private Player owner;
 
+    @Setter
+    private int health;
+
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         this.uuid = UUID.randomUUID();
         this.type = type;
         this.evs = new HashMap<>();
         setExp(0);
-        setLevel(1);
+        setLevel(15);
         this.permanentStats = permanentStats == null ? new PermanentStats(this) : permanentStats;
 
         setName(type.getName()); // Should be overwritten in case of a custom display name.
@@ -57,6 +60,35 @@ public abstract class Pokemon {
 
     protected Pokemon(PokemonType type) {
         this(type, null);
+    }
+
+    /**
+     * Gets this pokemon's base stats from its type.
+     *
+     * @return baseStats
+     */
+    public Map<PermanentStat, Integer> getBaseStats() {
+        return this.type.getBaseStats();
+    }
+
+    /**
+     * Adds Effort Values (EVs) to a specific stat of the Pokémon.
+     *
+     * @param stat   The stat to which EVs should be added.
+     * @param amount The amount of EVs to add. Must be a positive integer.
+     */
+    public void addEv(PermanentStat stat, int amount) {
+        if (amount <= PermanentStats.MIN_EV_AMOUNT)
+            return;
+
+        // Ensure the total EVs do not exceed the maximum allowed per Pokémon.
+        int remainingEVs = Math.min(PermanentStats.MAX_EV_AMOUNT_PER_POKEMON - getTotalEVs(), amount);
+        this.evs.put(stat, this.evs.getOrDefault(stat, 0) + remainingEVs);
+        this.permanentStats.randomizeStats(this);
+    }
+
+    private int getTotalEVs() {
+        return this.evs.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     /**
@@ -84,7 +116,7 @@ public abstract class Pokemon {
      *
      * @param amount The amount to set it to.
      */
-    public void setHP(int amount) {
+    protected void setHP(int amount) {
         this.permanentStats.setStat(PermanentStat.HP, amount);
     }
 
@@ -93,7 +125,7 @@ public abstract class Pokemon {
      */
     public void kill() {
         if (isAlive())
-            setHP(0);
+            this.health = 0;
 
         // TODO anything else
     }

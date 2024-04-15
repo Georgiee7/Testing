@@ -17,6 +17,7 @@ public class PermanentStats {
     public static final int MIN_BASE_STAT = 5;
     public static final int MAX_BASE_STAT = 255;
 
+    public static final int MIN_EV_AMOUNT = 0;
     public static final int MAX_EV_AMOUNT_PER_STAT = 252;
     public static final int MAX_EV_AMOUNT_PER_POKEMON = 510;
 
@@ -80,7 +81,13 @@ public class PermanentStats {
         this.stats.put(stat, Math.min(newValue, MAX_BASE_STAT));
     }
 
-    private void randomizeStats(Pokemon pokemon) {
+    /**
+     * Randomizes and re-assigns a Pokémon's stats according to Pokémon's base stat, EV and IV distribution rules.
+     * Original formula used.
+     *
+     * @param pokemon The Pokémon to randomize the stats of.
+     */
+    public void randomizeStats(Pokemon pokemon) {
         // Calculate total Poemon EVs.
         int totalEVs = pokemon.getEvs().values().stream().mapToInt(Integer::intValue).sum();
 
@@ -90,7 +97,7 @@ public class PermanentStats {
             int maxEVForStat = Math.min(remainingEVs, MAX_EV_AMOUNT_PER_STAT);
             int evForStat = ThreadLocalRandom.current().nextInt(maxEVForStat + 1);
 
-            this.stats.put(stat, MIN_BASE_STAT); // Initialize to minimum base stat.
+            this.stats.put(stat, pokemon.getBaseStats().getOrDefault(stat, MIN_BASE_STAT)); // Initialize to the Pokémon's base stat, or otherwise the minimum base stat.
             increaseStat(stat, evForStat); // Increase by random EVs.
             remainingEVs -= evForStat;
         }
@@ -109,10 +116,10 @@ public class PermanentStats {
     }
 
     private static int calculateHPStat(int baseStat, int iv, int ev, int pokemonLevel) {
-        return (2 * baseStat + iv + ev / 4 * pokemonLevel) / 100 + pokemonLevel + 10;
+        return ((2 * baseStat + iv + ev / 4) * pokemonLevel) / 100 + pokemonLevel + 10;
     }
 
     private static int calculateOtherStat(int baseStat, int iv, int ev, int pokemonLevel) {
-        return (2 * baseStat + iv + ev / 4 * pokemonLevel) / 100 + 5;
+        return ((2 * baseStat + iv + ev / 4) * pokemonLevel) / 100 + 5;
     }
 }
