@@ -72,21 +72,33 @@ public class Battle implements InstancedScenario {
     }
 
     /**
-     * Calculates the battle's winning party.
+     * Calculates the battle's winning party based on the number of alive combatants.
      *
      * @return winningParty
      */
     protected Party calculateWinner() {
-        for (Party party : this.parties) {
-            // TODO
-//            boolean hasAlivePokemon = party.getEntities().stream()
-//                    .anyMatch(player -> !player.getPokemons().isEmpty());
+        Party winningParty = null;
+        int maxAliveCombatants = Integer.MIN_VALUE;
 
-//            if (hasAlivePokemon)
-//                return party;
+        for (Party party : this.parties) {
+            int aliveCombatants = countAliveCombatants(party);
+            if (aliveCombatants > maxAliveCombatants) {
+                maxAliveCombatants = aliveCombatants;
+                winningParty = party;
+            }
         }
 
-        return null;
+        return winningParty;
+    }
+
+    /**
+     * Counts the number of alive combatants in a party.
+     *
+     * @param party The party to count alive combatants for.
+     * @return The number of alive combatants.
+     */
+    protected int countAliveCombatants(Party party) {
+        return (int) party.getEntities().stream().filter(Entity::isAlive).count();
     }
 
     /**
