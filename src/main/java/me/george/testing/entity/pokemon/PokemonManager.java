@@ -39,7 +39,6 @@ public class PokemonManager extends Manager {
     public static Pokemon create(PokemonType type, PermanentStats stats) {
         Utils.verifyNotNull(type, "Tried to create a pokemon with an invalid type!");
         Utils.verifyNotNull(type.getMaker(), "Tried to create pokemon: '" + type.getName() + "' which has an invalid/null maker!");
-
         Pokemon pokemon = type.getMaker().apply(stats);
         POKEMON_BY_UUID.put(pokemon.getUuid(), pokemon);
         return pokemon;

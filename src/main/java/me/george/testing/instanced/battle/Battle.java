@@ -215,7 +215,5 @@ public class Battle implements InstancedScenario {
         FINISHED
     }
 
-    @Getter
-        private record Turn(Entity attacker, Entity defender) {
-    }
+    private record Turn(Entity attacker, Entity defender) {}
 }

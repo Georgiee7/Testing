@@ -40,6 +40,12 @@ public abstract class Pokemon extends Combatant {
         return this.type.getBaseStats();
     }
 
+    @Override
+    public void levelUp() {
+        super.levelUp();
+        calculateStats();
+    }
+
     /**
      * Gets the Pokémon's elements based on its type.
      *

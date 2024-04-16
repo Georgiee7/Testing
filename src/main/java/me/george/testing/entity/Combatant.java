@@ -24,10 +24,19 @@ public abstract class Combatant extends Entity {
     protected Combatant(String name, PermanentStats permanentStats) {
         super(name);
         this.evs = new HashMap<>();
+        this.permanentStats = permanentStats == null ? new PermanentStats() : permanentStats;
         setAlive(true);
         setLevel(1);
         setExp(0);
-        this.permanentStats = permanentStats == null || !permanentStats.isInitialized() ? new PermanentStats(this) : permanentStats;
+        if (!this.permanentStats.isInitialized())
+            calculateStats();
+    }
+
+    /**
+     * Re-calculates this combatant's stats.
+     */
+    protected void calculateStats() {
+        this.permanentStats.calculateStats(this.evs, this.permanentStats.getStats(), getLevel());
     }
 
     /**
@@ -50,7 +59,7 @@ public abstract class Combatant extends Entity {
         // Ensure the total EVs do not exceed the maximum allowed per combatant.
         int remainingEVs = Math.min(PermanentStats.MAX_EV_AMOUNT_PER_POKEMON - getTotalEVs(), amount);
         this.evs.put(stat, this.evs.getOrDefault(stat, 0) + remainingEVs);
-        this.permanentStats.randomizeStats(this);
+        calculateStats();
     }
 
     private int getTotalEVs() {
