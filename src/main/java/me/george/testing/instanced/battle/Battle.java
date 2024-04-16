@@ -3,18 +3,18 @@ package me.george.testing.instanced.battle;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import me.george.testing.Testing;
 import me.george.testing.entity.Entity;
 import me.george.testing.instanced.InstancedScenario;
 import me.george.testing.manager.Manager;
 import me.george.testing.parties.Party;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Represents an instanced battle scenario.
+ * An instanced, turn-based battle scenario between parties that consist of entities such as players, NPCs and Pokémon.
+ * Combatants are strictly Pokémon that may belong to their own, natural party, or to a player's or NPC's team.
  * Created by George K. on 4/14/2024.
  */
 @Getter
@@ -23,6 +23,10 @@ public class Battle implements InstancedScenario {
     private final UUID uuid;
 
     private final List<Party> parties;
+    private final Queue<Entity> turnQueue;
+    private final List<Turn> pastTurns;
+
+    private Turn currentTurn;
 
     @Setter(AccessLevel.PROTECTED)
     private State state;
@@ -35,6 +39,8 @@ public class Battle implements InstancedScenario {
     public Battle(Collection<Party> parties) {
         this.uuid = UUID.randomUUID();
         this.parties = (List<Party>) parties;
+        this.turnQueue = new LinkedList<>();
+        this.pastTurns = new ArrayList<>();
         this.draw = false;
         start();
     }
@@ -43,6 +49,8 @@ public class Battle implements InstancedScenario {
     public void start() {
         log("Started battle between the parties of: " + this.parties.stream().map(party -> party.getLeader().getName()).collect(Collectors.joining(", ")));
         setState(State.ACTIVE);
+        initializeTurnQueue();
+        processNextTurn();
     }
 
     @Override
@@ -55,20 +63,65 @@ public class Battle implements InstancedScenario {
     public void resume() {
         setState(State.ACTIVE);
         log("Battle resumed.");
+        processNextTurn();
     }
 
     @Override
     public void finish() {
         this.winner = calculateWinner();
-
-        if (winner == null)
+        if (this.winner == null)
             this.draw = true;
 
         setState(State.FINISHED);
-        log(!this.draw ? "Battle finished with winning party: " + this.winner.getEntities().stream()
+        log(!this.draw ? "Battle finished with winning party: " + this.winner.getEntities()
+                .stream()
                 .map(Entity::getName)
                 .collect(Collectors.joining(", "))
                 : "The battle ended in a draw.");
+    }
+
+    private void initializeTurnQueue() {
+        this.parties.stream().map(Party::getEntities).forEach(this.turnQueue::addAll);
+    }
+
+    private void processNextTurn() {
+        if (!isFinished()) {
+            Entity attacker = this.turnQueue.poll();
+            Entity defender = getRandomOpponent(attacker); // Placeholder; a normal battle would include some sort of targeting system like targeting the lowest HP opponent first. This should obviously not deal with the active player's turn, they're supposed to play themselves.
+            if (attacker != null && defender != null) {
+                // TODO: Handle attack between attacker and defender.
+                Testing.logInfo(attacker.getName() + " attacked " + defender.getName()); // debug
+                this.currentTurn = new Turn(attacker, defender);
+                this.pastTurns.add(this.currentTurn);
+            }
+
+            checkBattleStatus();
+        }
+    }
+
+    private void checkBattleStatus() {
+        for (Party party : this.parties) {
+            if (party.getEntities().isEmpty()) {
+                this.winner = party;
+                finish();
+                break;
+            }
+        }
+    }
+
+    private Entity getRandomOpponent(Entity entity) {
+        Party opponentParty = this.parties.stream()
+                .filter(party -> !party.isMember(entity))
+                .findAny()
+                .orElse(null);
+
+        if (opponentParty != null) {
+            List<Entity> opponentEntities = opponentParty.getEntities();
+            Random random = new Random();
+            return opponentEntities.get(random.nextInt(opponentEntities.size()));
+        }
+
+        return null;
     }
 
     /**
@@ -79,7 +132,6 @@ public class Battle implements InstancedScenario {
     protected Party calculateWinner() {
         Party winningParty = null;
         int maxAliveCombatants = Integer.MIN_VALUE;
-
         for (Party party : this.parties) {
             int aliveCombatants = countAliveCombatants(party);
             if (aliveCombatants > maxAliveCombatants) {
@@ -89,6 +141,15 @@ public class Battle implements InstancedScenario {
         }
 
         return winningParty;
+    }
+
+    /**
+     * Gets the total amount of turns this battle has been going on for.
+     *
+     * @return totalTurns
+     */
+    protected int getTotalTurns() {
+        return this.turnQueue.size();
     }
 
     /**
@@ -148,9 +209,13 @@ public class Battle implements InstancedScenario {
         return isState(State.FINISHED);
     }
 
-    public enum State {
+    private enum State {
         ACTIVE,
         PAUSED,
         FINISHED
+    }
+
+    @Getter
+        private record Turn(Entity attacker, Entity defender) {
     }
 }

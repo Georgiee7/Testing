@@ -49,7 +49,7 @@ public class Party {
      * @param entity The entity in question.
      * @return isPartyMember
      */
-    protected boolean isMember(Entity entity) {
+    public boolean isMember(Entity entity) {
         return this.entities.contains(entity);
     }
 
