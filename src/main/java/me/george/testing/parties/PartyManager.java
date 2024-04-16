@@ -2,8 +2,8 @@ package me.george.testing.parties;
 
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
+import me.george.testing.entity.Entity;
 import me.george.testing.manager.Manager;
-import me.george.testing.player.Player;
 import me.george.testing.utils.Utils;
 
 import java.util.Collection;
@@ -20,91 +20,93 @@ public class PartyManager extends Manager {
 
     @Override
     public void onStop() {
-        Testing.logInfo("Unloading %d parties...", PARTIES_BY_UUID.size());
+        int parties = PARTIES_BY_UUID.size();
+        Testing.logInfo("Unloading %d parties...", parties);
         getParties().forEach(PartyManager::disbandParty);
         PARTIES_BY_UUID.clear();
+        Testing.logInfo("Cleared %d parties", parties);
     }
 
     /**
-     * Creates a new party of players, the leader of which is assigned at random.
+     * Creates a new party of entities, the leader of which is assigned at random.
      *
-     * @param players The members of the party.
+     * @param entities The members of the party.
      * @return newParty
      */
-    public static Party createParty(Collection<Player> players) {
-        return createParty(players, Utils.randElement(players));
+    public static Party createParty(Collection<Entity> entities) {
+        return createParty(entities, Utils.randElement(entities));
     }
 
     /**
-     * Creates a new party of players with a specified leader.
+     * Creates a new party of entities with a specified leader.
      *
-     * @param players The members of the party.
+     * @param entities The members of the party.
      * @param leader  The leader of the party.
      * @return newParty
      */
-    public static Party createParty(Collection<Player> players, Player leader) {
-        Utils.verifyNotNull(players, "Tried to create a party with null players.");
+    public static Party createParty(Collection<Entity> entities, Entity leader) {
+        Utils.verifyNotNull(entities, "Tried to create a party with null entities.");
         Utils.verifyNotNull(leader, "Tried to create a party with a null leader.");
 
-        return new Party(players, leader);
+        return new Party(entities, leader);
     }
 
     /**
-     * Disbands a party, removing all player members.
+     * Disbands a party, removing all entity members.
      *
      * @param party The party to disband.
      */
     public static void disbandParty(Party party) {
-        updateParty(party, p -> party.getPlayers().forEach(player -> removeFromParty(player, party)));
+        updateParty(party, p -> party.getEntities().forEach(entity -> removeFromParty(entity, party)));
     }
 
     /**
-     * Adds a player to a party.
+     * Adds an entity to a party.
      *
-     * @param player The player to add to the party.
-     * @param party  The party to add the player to.
+     * @param entity The entity to add to the party.
+     * @param party  The party to add the entity to.
      */
-    public static void addToParty(Player player, Party party) {
+    public static void addToParty(Entity entity, Party party) {
         updateParty(party, p -> {
-            if (p.isMember(player))
+            if (p.isMember(entity))
                 return;
 
-            p.addPlayer(player);
-            player.addToParty(party);
+            p.addEntity(entity);
+            entity.addToParty(party);
         });
     }
 
     /**
-     * Removes a player from a party.
+     * Removes an entity from a party.
      *
-     * @param player The player to remove from the party.
-     * @param party  The party to remove the player from.
+     * @param entity The entity to remove from the party.
+     * @param party  The party to remove the entity from.
      */
-    public static void removeFromParty(Player player, Party party) {
+    public static void removeFromParty(Entity entity, Party party) {
         updateParty(party, p -> {
-            if (!p.isMember(player))
+            if (!p.isMember(entity))
                 return;
 
-            if (p.isLeader(player) && p.getSize() - 1 > 0)
-                setLeader(p, Utils.randElement(p.getPlayers()));
+            if (p.isLeader(entity) && p.getSize() - 1 > 0)
+                setLeader(p, Utils.randElement(p.getEntities()));
 
-            player.removeFromParty();
-            p.removePlayer(player);
+            entity.removeFromParty();
+            p.removePlayer(entity);
         });
     }
 
     /**
-     * Assigns a player as the leader of their party, if they belong to one.
+     * Assigns an entity as the leader of their party, if they belong to one.
      *
-     * @param party  The assumed party of the player.
-     * @param player The player member of the party.
+     * @param party  The assumed party of the entity.
+     * @param entity The entity member of the party.
      */
-    public static void setLeader(Party party, Player player) {
+    public static void setLeader(Party party, Entity entity) {
         updateParty(party, p -> {
-            if (!party.isMember(player) || party.isLeader(player))
+            if (!party.isMember(entity) || party.isLeader(entity))
                 return;
 
-            p.setLeader(player);
+            p.setLeader(entity);
         });
     }
 

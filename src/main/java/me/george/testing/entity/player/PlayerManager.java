@@ -1,4 +1,4 @@
-package me.george.testing.player;
+package me.george.testing.entity.player;
 
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
@@ -23,15 +23,17 @@ public class PlayerManager extends Manager {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void onStop() {
-        Testing.logInfo("Unloading %d players...", PLAYERS_BY_UUID.size());
+        int players = PLAYERS_BY_UUID.size();
+        Testing.logInfo("Unloading %d players...", players);
         getPlayers().forEach(PlayerManager::save);
         PLAYERS_BY_UUID.clear();
+        Testing.logInfo("Cleared %d players", players);
     }
 
     /**
      * Creates and returns a new player.
      *
-     * @param name The type of Pokémon to create.
+     * @param name The name of the player.
      * @return newPlayer
      */
     public static Player create(String name) {

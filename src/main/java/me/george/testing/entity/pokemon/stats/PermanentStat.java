@@ -1,4 +1,4 @@
-package me.george.testing.pokemon.stats;
+package me.george.testing.entity.pokemon.stats;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

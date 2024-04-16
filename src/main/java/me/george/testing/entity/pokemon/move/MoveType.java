@@ -1,10 +1,10 @@
-package me.george.testing.pokemon.move;
+package me.george.testing.entity.pokemon.move;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.george.testing.pokemon.Element;
-import me.george.testing.pokemon.Pokemon;
-import me.george.testing.pokemon.PokemonType;
+import me.george.testing.entity.pokemon.PokemonType;
+import me.george.testing.entity.pokemon.Element;
+import me.george.testing.entity.pokemon.Pokemon;
 
 import java.util.function.BiFunction;
 

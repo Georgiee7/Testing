@@ -1,9 +1,9 @@
 package me.george.testing;
 
 import me.george.testing.manager.Manager;
-import me.george.testing.pokemon.Pokemon;
-import me.george.testing.pokemon.PokemonManager;
-import me.george.testing.pokemon.PokemonType;
+import me.george.testing.entity.pokemon.Pokemon;
+import me.george.testing.entity.pokemon.PokemonManager;
+import me.george.testing.entity.pokemon.PokemonType;
 import me.george.testing.utils.Utils;
 
 /**

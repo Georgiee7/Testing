@@ -1,10 +1,10 @@
-package me.george.testing.pokemon;
+package me.george.testing.entity.pokemon;
 
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
+import me.george.testing.entity.pokemon.stats.PermanentStats;
 import me.george.testing.manager.Manager;
-import me.george.testing.player.Player;
-import me.george.testing.pokemon.stats.PermanentStats;
+import me.george.testing.entity.player.Player;
 import me.george.testing.utils.Utils;
 
 import java.util.Collection;

@@ -23,8 +23,10 @@ public class BattleManager extends Manager {
 
     @Override
     public void onStop() {
-        Testing.logInfo("Stopping %d battles...", ACTIVE_BATTLES.size());
+        int battles = ACTIVE_BATTLES.size();
+        Testing.logInfo("Stopping %d battles...", battles);
         ACTIVE_BATTLES.values().forEach(Battle::stop);
+        Testing.logInfo("Stopped %d battles.", battles);
     }
 
     /**

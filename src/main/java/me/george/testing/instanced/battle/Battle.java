@@ -3,10 +3,10 @@ package me.george.testing.instanced.battle;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import me.george.testing.entity.Entity;
 import me.george.testing.instanced.InstancedScenario;
 import me.george.testing.manager.Manager;
 import me.george.testing.parties.Party;
-import me.george.testing.player.Player;
 
 import java.util.Collection;
 import java.util.List;
@@ -65,8 +65,8 @@ public class Battle implements InstancedScenario {
             this.draw = true;
 
         setState(State.FINISHED);
-        log(!this.draw ? "Battle finished with winning party: " + this.winner.getPlayers().stream()
-                .map(Player::getName)
+        log(!this.draw ? "Battle finished with winning party: " + this.winner.getEntities().stream()
+                .map(Entity::getName)
                 .collect(Collectors.joining(", "))
                 : "The battle ended in a draw.");
     }
@@ -78,11 +78,12 @@ public class Battle implements InstancedScenario {
      */
     protected Party calculateWinner() {
         for (Party party : this.parties) {
-            boolean hasAlivePokemon = party.getPlayers().stream()
-                    .anyMatch(player -> !player.getPokemons().isEmpty());
+            // TODO
+//            boolean hasAlivePokemon = party.getEntities().stream()
+//                    .anyMatch(player -> !player.getPokemons().isEmpty());
 
-            if (hasAlivePokemon)
-                return party;
+//            if (hasAlivePokemon)
+//                return party;
         }
 
         return null;

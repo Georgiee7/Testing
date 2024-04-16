@@ -3,7 +3,7 @@ package me.george.testing.parties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.player.Player;
+import me.george.testing.entity.Entity;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,60 +15,60 @@ import java.util.List;
 @Getter
 public class Party {
 
-    private final List<Player> players;
+    private final List<Entity> entities;
 
     @Setter(AccessLevel.PROTECTED)
-    private Player leader;
+    private Entity leader;
 
-    protected Party(Collection<Player> players, Player leader) {
-        this.players = (List<Player>) players;
+    protected Party(Collection<Entity> entities, Entity leader) {
+        this.entities = (List<Entity>) entities;
         this.leader = leader;
     }
 
     /**
-     * Adds a player to the party.
+     * Adds an entity to the party.
      *
-     * @param player The player to add.
+     * @param entity The entity to add.
      */
-    protected void addPlayer(Player player) {
-        this.players.add(player);
+    protected void addEntity(Entity entity) {
+        this.entities.add(entity);
     }
 
     /**
-     * Removes a player from the party.
+     * Removes an entity from the party.
      *
-     * @param player The player to remove.
+     * @param entity The entity to remove.
      */
-    protected void removePlayer(Player player) {
-        this.players.remove(player);
+    protected void removePlayer(Entity entity) {
+        this.entities.remove(entity);
     }
 
     /**
-     * Whether a player is a member of the party or not.
+     * Whether an entity is a member of the party or not.
      *
-     * @param player The player in question.
+     * @param entity The entity in question.
      * @return isPartyMember
      */
-    protected boolean isMember(Player player) {
-        return this.players.contains(player);
+    protected boolean isMember(Entity entity) {
+        return this.entities.contains(entity);
     }
 
     /**
-     * Whether a player is the leader of the party.
+     * Whether a entity is the leader of the party.
      *
-     * @param player The player in question.
+     * @param entity The entity in question.
      * @return isPartyLeader
      */
-    protected boolean isLeader(Player player) {
-        return isMember(player) && this.leader == player;
+    protected boolean isLeader(Entity entity) {
+        return isMember(entity) && this.leader == entity;
     }
 
     /**
-     * Gets the amount of player members in the party.
+     * Gets the amount of members in the party.
      *
      * @return memberCount
      */
     protected int getSize() {
-        return getPlayers().size();
+        return getEntities().size();
     }
 }

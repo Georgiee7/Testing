@@ -4,8 +4,8 @@ import lombok.Getter;
 import me.george.testing.Testing;
 import me.george.testing.instanced.battle.BattleManager;
 import me.george.testing.parties.PartyManager;
-import me.george.testing.player.PlayerManager;
-import me.george.testing.pokemon.PokemonManager;
+import me.george.testing.entity.player.PlayerManager;
+import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.utils.ReflectionUtil;
 import me.george.testing.utils.Utils;
 

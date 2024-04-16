@@ -1,9 +1,9 @@
 package me.george.testing.manager;
 
-import me.george.testing.pokemon.Element;
-import me.george.testing.pokemon.Pokemon;
-import me.george.testing.pokemon.move.DamageMove;
-import me.george.testing.pokemon.move.Move;
+import me.george.testing.entity.pokemon.Element;
+import me.george.testing.entity.pokemon.Pokemon;
+import me.george.testing.entity.pokemon.move.DamageMove;
+import me.george.testing.entity.pokemon.move.Move;
 
 /**
  * Handles combat related mechanics.

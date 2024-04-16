@@ -1,8 +1,8 @@
-package me.george.testing.pokemon.types.t1.fire;
+package me.george.testing.entity.pokemon.types.t1.fire;
 
-import me.george.testing.pokemon.Pokemon;
-import me.george.testing.pokemon.PokemonType;
-import me.george.testing.pokemon.stats.PermanentStats;
+import me.george.testing.entity.pokemon.stats.PermanentStats;
+import me.george.testing.entity.pokemon.Pokemon;
+import me.george.testing.entity.pokemon.PokemonType;
 
 /**
  * The Charmander Pokémon.

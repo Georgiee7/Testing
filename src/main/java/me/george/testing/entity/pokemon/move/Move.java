@@ -1,9 +1,9 @@
-package me.george.testing.pokemon.move;
+package me.george.testing.entity.pokemon.move;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.pokemon.Element;
-import me.george.testing.pokemon.Pokemon;
+import me.george.testing.entity.pokemon.Element;
+import me.george.testing.entity.pokemon.Pokemon;
 
 /**
  * Represents a move that can be performed by Pokémon, that consists of a particular element.

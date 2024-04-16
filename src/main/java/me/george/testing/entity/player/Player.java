@@ -1,26 +1,23 @@
-package me.george.testing.player;
+package me.george.testing.entity.player;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.parties.Party;
-import me.george.testing.pokemon.Pokemon;
-import me.george.testing.pokemon.PokemonType;
+import me.george.testing.entity.Entity;
+import me.george.testing.entity.pokemon.Pokemon;
+import me.george.testing.entity.pokemon.PokemonType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a player that can own Pokémon slaves.
  * Created by George K. on 4/14/2024.
  */
 @Getter
-public class Player {
-
-    private final UUID uuid;
-
-    @Setter(AccessLevel.PROTECTED)
-    private String name;
-
+public class Player extends Entity {
     private final List<Pokemon> pokemons;
 
     private final Map<Integer, PokemonType> pokedex;
@@ -28,13 +25,15 @@ public class Player {
     @Setter(AccessLevel.PROTECTED)
     private Pokemon activePokemon;
 
-    private Party party;
-
     protected Player(String name) {
-        this.uuid = UUID.randomUUID();
-        this.name = name;
+        super(name);
         this.pokemons = new ArrayList<>();
         this.pokedex = new HashMap<>();
+    }
+
+    @Override
+    public boolean save() {
+        return true;
     }
 
     /**
@@ -99,21 +98,5 @@ public class Player {
      */
     public boolean hasUnlocked(PokemonType type) {
         return this.pokedex.containsValue(type);
-    }
-
-    /**
-     * Adds the player to a party.
-     *
-     * @param party The party to add the player to.
-     */
-    public void addToParty(Party party) {
-        this.party = party;
-    }
-
-    /**
-     * Removes the player from their party.
-     */
-    public void removeFromParty() {
-        this.party = null;
     }
 }

@@ -1,7 +1,7 @@
-package me.george.testing.pokemon.stats;
+package me.george.testing.entity.pokemon.stats;
 
 import lombok.Getter;
-import me.george.testing.pokemon.Pokemon;
+import me.george.testing.entity.Combatant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,15 +27,15 @@ public class PermanentStats {
     private final Map<PermanentStat, Integer> stats;
     private boolean initialized;
 
-    public PermanentStats(Pokemon pokemon, Map<PermanentStat, Integer> stats) {
+    public PermanentStats(Combatant combatant, Map<PermanentStat, Integer> stats) {
         this.stats = stats;
         this.initialized = stats != null && !stats.isEmpty();
         if (!initialized)
-            randomizeStats(pokemon);
+            randomizeStats(combatant);
     }
 
-    public PermanentStats(Pokemon pokemon) {
-        this(pokemon, new HashMap<>());
+    public PermanentStats(Combatant combatant) {
+        this(combatant, new HashMap<>());
     }
 
     /**
@@ -82,14 +82,14 @@ public class PermanentStats {
     }
 
     /**
-     * Randomizes and re-assigns a Pokémon's stats according to Pokémon's base stat, EV and IV distribution rules.
+     * Randomizes and re-assigns a combatant's stats according to Pokémon's base stat, EV and IV distribution rules.
      * Original formula used.
      *
-     * @param pokemon The Pokémon to randomize the stats of.
+     * @param combatant The combatant to randomize the stats of.
      */
-    public void randomizeStats(Pokemon pokemon) {
-        // Calculate total Poemon EVs.
-        int totalEVs = pokemon.getEvs().values().stream().mapToInt(Integer::intValue).sum();
+    public void randomizeStats(Combatant combatant) {
+        // Calculate total combatant EVs.
+        int totalEVs = combatant.getEvs().values().stream().mapToInt(Integer::intValue).sum();
 
         // Distribute EVs among stats, ensuring they don't exceed the maximum allowed per stat.
         int remainingEVs = Math.min(totalEVs, MAX_EV_AMOUNT_PER_POKEMON);
@@ -97,17 +97,18 @@ public class PermanentStats {
             int maxEVForStat = Math.min(remainingEVs, MAX_EV_AMOUNT_PER_STAT);
             int evForStat = ThreadLocalRandom.current().nextInt(maxEVForStat + 1);
 
-            this.stats.put(stat, pokemon.getBaseStats().getOrDefault(stat, MIN_BASE_STAT)); // Initialize to the Pokémon's base stat, or otherwise the minimum base stat.
+            this.stats.put(stat, combatant.getBaseStats().getOrDefault(stat, MIN_BASE_STAT)); // Initialize to the combatant's base stat, or otherwise the minimum base stat.
             increaseStat(stat, evForStat); // Increase by random EVs.
             remainingEVs -= evForStat;
         }
+        // TODO: Fix NPE.
 
         // Generate IVs (Individual Values) for each stat.
         for (PermanentStat stat : PermanentStat.values()) {
             int iv = ThreadLocalRandom.current().nextInt(MIN_IV_ROLL, MAX_IV_ROLL + 1);
             int baseStat = getStat(stat);
             int ev = getStat(stat) - MIN_BASE_STAT;
-            int pokemonLevel = pokemon.getLevel();
+            int pokemonLevel = combatant.getLevel();
 
             setStat(stat, stat == PermanentStat.HP ? calculateHPStat(baseStat, iv, ev, pokemonLevel) : calculateOtherStat(baseStat, iv, ev, pokemonLevel));
         }
@@ -115,11 +116,11 @@ public class PermanentStats {
         this.initialized = true;
     }
 
-    private static int calculateHPStat(int baseStat, int iv, int ev, int pokemonLevel) {
-        return ((2 * baseStat + iv + ev / 4) * pokemonLevel) / 100 + pokemonLevel + 10;
+    private static int calculateHPStat(int baseStat, int iv, int ev, int level) {
+        return ((2 * baseStat + iv + ev / 4) * level) / 100 + level + 10;
     }
 
-    private static int calculateOtherStat(int baseStat, int iv, int ev, int pokemonLevel) {
-        return ((2 * baseStat + iv + ev / 4) * pokemonLevel) / 100 + 5;
+    private static int calculateOtherStat(int baseStat, int iv, int ev, int level) {
+        return ((2 * baseStat + iv + ev / 4) * level) / 100 + 5;
     }
 }
