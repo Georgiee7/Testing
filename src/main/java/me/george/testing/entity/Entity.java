@@ -40,7 +40,17 @@ public abstract class Entity {
     }
 
     /**
+     * Whether the entity belongs to a party or not.
+     *
+     * @return isInParty
+     */
+    public boolean isInParty() {
+        return this.party != null;
+    }
+
+    /**
      * Saves this entity's data.
+     *
      * @return dataSaved
      */
     public abstract boolean save();
@@ -71,6 +81,7 @@ public abstract class Entity {
 
     /**
      * Gives exp to this entity, can proc level-up.
+     * Uses a default formula, should be overridden if custom exp is desired.
      *
      * @param exp The exp to give.
      */
@@ -81,6 +92,32 @@ public abstract class Entity {
         setExp(this.exp + exp);
         while (this.exp >= getNeededExp() && !(isMaxLevel()))
             levelUp();
+    }
+
+    /**
+     * Calculates the needed exp to progress to a level.
+     * Uses a default formula, should be overridden if custom exp is desired.
+     *
+     * @param level The level to use as a reference.
+     * @return neededExp
+     */
+    protected int getNeededExp(int level) {
+        if (level < 1)
+            level = 1;
+
+        int levelExp = CACHED_EXP_REQUIREMENT[level - 1];
+        if (levelExp > 0)
+            return levelExp;
+
+        if (level > 1) {
+            int lastLevel = level - 1;
+            levelExp = (int) (getNeededExp(lastLevel) + Math.pow(lastLevel, 2) + (lastLevel * 24) + 150);
+        } else {
+            levelExp = 176;
+        }
+
+        CACHED_EXP_REQUIREMENT[level - 1] = levelExp;
+        return levelExp;
     }
 
     /**
@@ -98,26 +135,6 @@ public abstract class Entity {
      */
     public int getNeededExp() {
         return getNeededExp(getLevel());
-    }
-
-    private static int getNeededExp(int level) {
-        // Statically defined exp formula.
-        if (level < 1)
-            level = 1;
-
-        int levelExp = CACHED_EXP_REQUIREMENT[level - 1];
-        if (levelExp > 0)
-            return levelExp;
-
-        if (level > 1) {
-            int lastLevel = level - 1;
-            levelExp = (int) (getNeededExp(lastLevel) + Math.pow(lastLevel, 2) + (lastLevel * 24) + 150);
-        } else {
-            levelExp = 176;
-        }
-
-        CACHED_EXP_REQUIREMENT[level - 1] = levelExp;
-        return levelExp;
     }
 
     /**

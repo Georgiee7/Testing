@@ -93,7 +93,7 @@ public class PermanentStats {
             int maxEVForStat = Math.min(remainingEVs, MAX_EV_AMOUNT_PER_STAT);
             int evForStat = ThreadLocalRandom.current().nextInt(maxEVForStat + 1);
 
-            this.stats.put(stat, baseStats.getOrDefault(stat, MIN_BASE_STAT)); // Initialize to the base stat, or otherwise the minimum base stat.
+            this.stats.put(stat, baseStats.getOrDefault(stat, MIN_BASE_STAT)); // Initialize to the stat, or otherwise the minimum base stat.
             increaseStat(stat, evForStat); // Increase by random EVs.
             remainingEVs -= evForStat;
         }

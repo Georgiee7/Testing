@@ -73,7 +73,7 @@ public class Battle implements InstancedScenario {
             this.draw = true;
 
         setState(State.FINISHED);
-        log(!this.draw ? "Battle finished with winning party: " + this.winner.getEntities()
+        log(!this.draw ? "Battle finished with winning party: " + this.winner.getMembers()
                 .stream()
                 .map(Entity::getName)
                 .collect(Collectors.joining(", "))
@@ -81,7 +81,7 @@ public class Battle implements InstancedScenario {
     }
 
     private void initializeTurnQueue() {
-        this.parties.stream().map(Party::getEntities).forEach(this.turnQueue::addAll);
+        this.parties.stream().map(Party::getMembers).forEach(this.turnQueue::addAll);
     }
 
     private void processNextTurn() {
@@ -101,7 +101,7 @@ public class Battle implements InstancedScenario {
 
     private void checkBattleStatus() {
         for (Party party : this.parties) {
-            if (party.getEntities().isEmpty()) {
+            if (party.getMembers().isEmpty()) {
                 this.winner = party;
                 finish();
                 break;
@@ -116,7 +116,7 @@ public class Battle implements InstancedScenario {
                 .orElse(null);
 
         if (opponentParty != null) {
-            List<Entity> opponentEntities = opponentParty.getEntities();
+            List<Entity> opponentEntities = opponentParty.getMembers();
             Random random = new Random();
             return opponentEntities.get(random.nextInt(opponentEntities.size()));
         }
@@ -159,7 +159,7 @@ public class Battle implements InstancedScenario {
      * @return The number of alive combatants.
      */
     protected int countAliveCombatants(Party party) {
-        return (int) party.getEntities().stream().filter(Entity::isAlive).count();
+        return (int) party.getCombatants().stream().filter(Entity::isAlive).count();
     }
 
     /**
@@ -209,7 +209,7 @@ public class Battle implements InstancedScenario {
         return isState(State.FINISHED);
     }
 
-    private enum State {
+    public enum State {
         ACTIVE,
         PAUSED,
         FINISHED

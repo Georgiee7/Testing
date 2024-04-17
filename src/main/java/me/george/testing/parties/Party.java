@@ -3,8 +3,10 @@ package me.george.testing.parties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import me.george.testing.entity.Combatant;
 import me.george.testing.entity.Entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,14 +17,27 @@ import java.util.List;
 @Getter
 public class Party {
 
-    private final List<Entity> entities;
+    private final List<Entity> members;
 
     @Setter(AccessLevel.PROTECTED)
     private Entity leader;
 
-    protected Party(Collection<Entity> entities, Entity leader) {
-        this.entities = (List<Entity>) entities;
+    protected Party(Collection<Entity> members, Collection<Combatant> combatants, Entity leader) {
+        this.members = (List<Entity>) members;
+        if (combatants == null)
+            combatants = new ArrayList<>();
+
+        this.members.addAll(combatants);
         this.leader = leader;
+    }
+
+    /**
+     * Whether the party is empty or not.
+     *
+     * @return partyIsEmpty
+     */
+    public boolean isEmpty() {
+        return this.members.isEmpty();
     }
 
     /**
@@ -31,7 +46,7 @@ public class Party {
      * @param entity The entity to add.
      */
     protected void addEntity(Entity entity) {
-        this.entities.add(entity);
+        this.members.add(entity);
     }
 
     /**
@@ -40,7 +55,7 @@ public class Party {
      * @param entity The entity to remove.
      */
     protected void removePlayer(Entity entity) {
-        this.entities.remove(entity);
+        this.members.remove(entity);
     }
 
     /**
@@ -50,11 +65,21 @@ public class Party {
      * @return isPartyMember
      */
     public boolean isMember(Entity entity) {
-        return this.entities.contains(entity);
+        return this.members.contains(entity);
     }
 
     /**
-     * Whether a entity is the leader of the party.
+     * Whether a member of this party is combatant.
+     *
+     * @param entity The entity in question.
+     * @return isCombatantEntity
+     */
+    public boolean isCombatant(Entity entity) {
+        return isMember(entity) && entity instanceof Combatant;
+    }
+
+    /**
+     * Whether an entity is the leader of the party.
      *
      * @param entity The entity in question.
      * @return isPartyLeader
@@ -69,6 +94,15 @@ public class Party {
      * @return memberCount
      */
     protected int getSize() {
-        return getEntities().size();
+        return getMembers().size();
+    }
+
+    /**
+     * Gets the combatant members of this party.
+     *
+     * @return combatantMembers
+     */
+    public List<Entity> getCombatants() {
+        return this.members.stream().filter(Combatant.class::isInstance).toList();
     }
 }

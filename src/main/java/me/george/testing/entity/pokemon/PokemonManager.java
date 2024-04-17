@@ -2,13 +2,14 @@ package me.george.testing.entity.pokemon;
 
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
+import me.george.testing.entity.player.Player;
 import me.george.testing.entity.pokemon.stats.PermanentStats;
 import me.george.testing.manager.Manager;
-import me.george.testing.entity.player.Player;
 import me.george.testing.utils.Utils;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 /**
@@ -39,6 +40,7 @@ public class PokemonManager extends Manager {
     public static Pokemon create(PokemonType type, PermanentStats stats) {
         Utils.verifyNotNull(type, "Tried to create a pokemon with an invalid type!");
         Utils.verifyNotNull(type.getMaker(), "Tried to create pokemon: '" + type.getName() + "' which has an invalid/null maker!");
+
         Pokemon pokemon = type.getMaker().apply(stats);
         POKEMON_BY_UUID.put(pokemon.getUuid(), pokemon);
         return pokemon;
@@ -51,7 +53,6 @@ public class PokemonManager extends Manager {
      * @param player  The new Pokémon's owner.
      */
     public static void setPokemonOwner(Pokemon pokemon, Player player) {
-        Utils.verifyNotNull(pokemon, "Cannot set the owner of a null pokemon.");
         Utils.verifyNotNull(player, "Tried to make a null player the owner of a pokemon.");
 
         removePokemonOwner(pokemon, pokemon.getOwner());
@@ -69,11 +70,22 @@ public class PokemonManager extends Manager {
      * @param player  The player to remove the Pokémon from.
      */
     public static void removePokemonOwner(Pokemon pokemon, Player player) {
-        Utils.verifyNotNull(pokemon, "Cannot remove a null pokemon from a player.");
         Utils.verifyNotNull(player, "Tried to remove a pokemon from a null owner.");
+        updatePokemon(pokemon, p -> {
+            player.removePokemon(pokemon);
+            p.setOwner(null);
+        });
+    }
 
-        player.removePokemon(pokemon);
-        pokemon.setOwner(null);
+    /**
+     * Updates a Pokémon with a specific callback.
+     *
+     * @param pokemon The Pokémon to update.
+     * @param callback The action to perform.
+     */
+    public static void updatePokemon(Pokemon pokemon, Consumer<Pokemon> callback) {
+        Utils.verifyNotNull(pokemon, "Cannot update a null pokemon.");
+        callback.accept(pokemon);
     }
 
     /**

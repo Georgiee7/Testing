@@ -27,7 +27,7 @@ public class PlayerManager extends Manager {
         Testing.logInfo("Unloading %d players...", players);
         getPlayers().forEach(PlayerManager::save);
         PLAYERS_BY_UUID.clear();
-        Testing.logInfo("Cleared %d players", players);
+        Testing.logInfo("Cleared %d players.", players);
     }
 
     /**

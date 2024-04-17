@@ -2,6 +2,7 @@ package me.george.testing.parties;
 
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
+import me.george.testing.entity.Combatant;
 import me.george.testing.entity.Entity;
 import me.george.testing.manager.Manager;
 import me.george.testing.utils.Utils;
@@ -24,7 +25,7 @@ public class PartyManager extends Manager {
         Testing.logInfo("Unloading %d parties...", parties);
         getParties().forEach(PartyManager::disbandParty);
         PARTIES_BY_UUID.clear();
-        Testing.logInfo("Cleared %d parties", parties);
+        Testing.logInfo("Cleared %d parties.", parties);
     }
 
     /**
@@ -33,8 +34,8 @@ public class PartyManager extends Manager {
      * @param entities The members of the party.
      * @return newParty
      */
-    public static Party createParty(Collection<Entity> entities) {
-        return createParty(entities, Utils.randElement(entities));
+    public static Party createParty(Collection<Entity> entities, Collection<Combatant> combatants) {
+        return createParty(entities, combatants, Utils.randElement(entities));
     }
 
     /**
@@ -44,11 +45,12 @@ public class PartyManager extends Manager {
      * @param leader  The leader of the party.
      * @return newParty
      */
-    public static Party createParty(Collection<Entity> entities, Entity leader) {
+    public static Party createParty(Collection<Entity> entities, Collection<Combatant> combatants, Entity leader) {
         Utils.verifyNotNull(entities, "Tried to create a party with null entities.");
         Utils.verifyNotNull(leader, "Tried to create a party with a null leader.");
+        Utils.verify(!leader.isInParty() && entities.stream().noneMatch(Entity::isInParty), "Tried to create a party when the entities and/or the leader already belong to one.");
 
-        return new Party(entities, leader);
+        return new Party(entities, combatants, leader);
     }
 
     /**
@@ -57,7 +59,7 @@ public class PartyManager extends Manager {
      * @param party The party to disband.
      */
     public static void disbandParty(Party party) {
-        updateParty(party, p -> party.getEntities().forEach(entity -> removeFromParty(entity, party)));
+        updateParty(party, p -> party.getMembers().forEach(entity -> removeFromParty(entity, party)));
     }
 
     /**
@@ -88,10 +90,12 @@ public class PartyManager extends Manager {
                 return;
 
             if (p.isLeader(entity) && p.getSize() - 1 > 0)
-                setLeader(p, Utils.randElement(p.getEntities()));
+                setLeader(p, Utils.randElement(p.getMembers()));
 
             entity.removeFromParty();
             p.removePlayer(entity);
+            if (p.isEmpty())
+                disbandParty(p);
         });
     }
 
