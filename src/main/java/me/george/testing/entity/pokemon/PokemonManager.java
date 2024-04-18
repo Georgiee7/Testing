@@ -5,6 +5,7 @@ import me.george.testing.data.storage.supported.InMemoryCache;
 import me.george.testing.entity.player.Player;
 import me.george.testing.entity.pokemon.stats.PermanentStats;
 import me.george.testing.manager.Manager;
+import me.george.testing.utils.GeneralException;
 import me.george.testing.utils.Utils;
 
 import java.util.Collection;
@@ -55,7 +56,13 @@ public class PokemonManager extends Manager {
     public static void setPokemonOwner(Pokemon pokemon, Player player) {
         Utils.verifyNotNull(player, "Tried to make a null player the owner of a pokemon.");
 
-        removePokemonOwner(pokemon, pokemon.getOwner());
+        if (pokemon.hasOwner()) {
+            if (pokemon.getOwner().getUuid().equals(player.getUuid()))
+                throw new GeneralException("Tried to make player %s the owner of a pokemon they already own!", player.getName());
+
+            removePokemonOwner(pokemon, pokemon.getOwner());
+        }
+
         pokemon.setOwner(player);
         if (!player.hasPokemon(pokemon))
             player.addPokemon(pokemon);
@@ -78,12 +85,17 @@ public class PokemonManager extends Manager {
     }
 
     /**
-     * Updates a Pokémon with a specific callback.
+     * Updates a Pokémon's name to a new name.
      *
-     * @param pokemon The Pokémon to update.
-     * @param callback The action to perform.
+     * @param pokemon The Pokémon whose name to update.
+     * @param name The new name to set.
      */
-    public static void updatePokemon(Pokemon pokemon, Consumer<Pokemon> callback) {
+    public static void setPokemonName(Pokemon pokemon, String name) {
+        Utils.verify(isValidPokemonName(name), "Tried to set an invalid name: '%s' to %s.", name, pokemon.getName());
+        updatePokemon(pokemon, p -> p.setName(name));
+    }
+
+    private static void updatePokemon(Pokemon pokemon, Consumer<Pokemon> callback) {
         Utils.verifyNotNull(pokemon, "Cannot update a null pokemon.");
         callback.accept(pokemon);
     }
@@ -105,6 +117,15 @@ public class PokemonManager extends Manager {
      */
     public static void removePokemon(UUID id) {
         POKEMON_BY_UUID.remove(id);
+    }
+
+    /**
+     * Removes a pokemon.
+     *
+     * @param pokemon The pokemon to remove.
+     */
+    public static void removePokemon(Pokemon pokemon) {
+        removePokemon(pokemon.getUuid());
     }
 
     /**

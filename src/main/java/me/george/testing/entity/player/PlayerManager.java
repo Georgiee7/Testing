@@ -18,7 +18,7 @@ public class PlayerManager extends Manager {
 
     private static final InMemoryCache<UUID, Player> PLAYERS_BY_UUID = new InMemoryCache<>();
 
-    private static final Pattern VALID_NAME_SYNTAX_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,12}$"); // Underscores, 3 chars min, 12 chars max, alphanumeric english characters.
+    private static final Pattern VALID_NAME_SYNTAX_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,16}$"); // Underscores, 3 chars min, 16 chars max, alphanumeric english characters.
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -37,7 +37,7 @@ public class PlayerManager extends Manager {
      * @return newPlayer
      */
     public static Player create(String name) {
-        Utils.verify(!Utils.isNullOrEmpty(name), "Tried to create a player with an invalid name: %s", name);
+        Utils.verify(isValidPlayerName(name), "Tried to create a player with an invalid name: %s", name);
 
         Player player = new Player(name);
         PLAYERS_BY_UUID.put(player.getUuid(), player);
@@ -62,9 +62,10 @@ public class PlayerManager extends Manager {
      *
      * @param player The player to erase all data of.
      */
-    public static void deleteData(Player player) {
+    public static boolean deleteData(Player player) {
         // Remove any storage data and remove from cache.
         remove(player);
+        return true;
     }
 
     /**
@@ -104,6 +105,25 @@ public class PlayerManager extends Manager {
      */
     public static Collection<Player> getPlayers() {
         return PLAYERS_BY_UUID.getValues();
+    }
+
+    /**
+     * Gets a player by their id, or null if one does not exist.
+     *
+     * @param id The id to search for.
+     * @return playerById
+     */
+    public static Player getPlayer(UUID id) {
+        return PLAYERS_BY_UUID.get(id);
+    }
+
+    /**
+     * Removes a player by their id.
+     *
+     * @param id The id to search for.
+     */
+    public static void removePlayer(UUID id) {
+        PLAYERS_BY_UUID.remove(id);
     }
 
     /**

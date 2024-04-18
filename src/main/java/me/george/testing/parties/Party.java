@@ -27,7 +27,7 @@ public class Party {
         if (combatants == null)
             combatants = new ArrayList<>();
 
-        this.members.addAll(combatants);
+        this.members.addAll(combatants); // Wrapping the collection with an arraylist to prevent UnsupportedOperationException
         this.leader = leader;
     }
 
@@ -84,7 +84,7 @@ public class Party {
      * @param entity The entity in question.
      * @return isPartyLeader
      */
-    protected boolean isLeader(Entity entity) {
+    public boolean isLeader(Entity entity) {
         return isMember(entity) && this.leader == entity;
     }
 
@@ -93,7 +93,7 @@ public class Party {
      *
      * @return memberCount
      */
-    protected int getSize() {
+    public int getSize() {
         return getMembers().size();
     }
 
@@ -104,5 +104,14 @@ public class Party {
      */
     public List<Entity> getCombatants() {
         return this.members.stream().filter(Combatant.class::isInstance).toList();
+    }
+
+    /**
+     * Gets the non-combatant members of this party.
+     *
+     * @return nonCombatantMembers
+     */
+    public List<Entity> getNonCombatants() {
+        return this.members.stream().filter(combatant -> !(combatant instanceof Combatant)).toList();
     }
 }

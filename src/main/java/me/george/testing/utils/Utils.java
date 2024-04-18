@@ -67,7 +67,7 @@ public class Utils {
      */
     @SuppressWarnings("ConstantConditions")
     public static void verifyNotNull(Object object, String error) {
-        assert object != null; // Our IDE will not give warnings handled by this method if use assert. However, we tell the JVM to disable assert so our own custom exceptions are used at run-time.
+        assert object != null; // Our IDE will not give warnings handled by this method if assert is used. However, we tell the JVM to disable assert so our own custom exceptions are used at run-time.
         if (object == null)
             throw new GeneralException(error);
     }

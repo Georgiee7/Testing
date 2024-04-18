@@ -7,7 +7,9 @@ import me.george.testing.entity.Entity;
 import me.george.testing.manager.Manager;
 import me.george.testing.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -59,7 +61,8 @@ public class PartyManager extends Manager {
      * @param party The party to disband.
      */
     public static void disbandParty(Party party) {
-        updateParty(party, p -> party.getMembers().forEach(entity -> removeFromParty(entity, party)));
+        List<Entity> membersCopy = new ArrayList<>(party.getMembers());
+        membersCopy.forEach(member -> removeFromParty(member, party));
     }
 
     /**
@@ -90,10 +93,10 @@ public class PartyManager extends Manager {
                 return;
 
             if (p.isLeader(entity) && p.getSize() - 1 > 0)
-                setLeader(p, Utils.randElement(p.getMembers()));
+                setLeader(p, Utils.randElement(p.getNonCombatants())); // Prevent leadership from going to Pokémon.
 
-            entity.removeFromParty();
             p.removePlayer(entity);
+            entity.removeFromParty();
             if (p.isEmpty())
                 disbandParty(p);
         });
@@ -132,7 +135,7 @@ public class PartyManager extends Manager {
      *
      * @return activeCachedParties
      */
-    public Collection<Party> getParties() {
+    public static Collection<Party> getParties() {
         return PARTIES_BY_UUID.getValues();
     }
 }

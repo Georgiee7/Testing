@@ -100,6 +100,15 @@ public abstract class Pokemon extends Combatant {
         return true;
     }
 
+    /**
+     * Whether this Pokémon is owned by someone or not.
+     *
+     * @return pokemonOwned
+     */
+    public boolean hasOwner() {
+        return this.owner != null;
+    }
+
     @Override
     public String toString() {
         return "Pokemon: " + this.type.getName() + "\n" +

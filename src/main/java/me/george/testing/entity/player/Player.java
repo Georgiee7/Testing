@@ -7,10 +7,7 @@ import me.george.testing.entity.Entity;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents a player that can own Pokémon slaves.
@@ -18,7 +15,7 @@ import java.util.Map;
  */
 @Getter
 public class Player extends Entity {
-    private final List<Pokemon> pokemons;
+    private final Set<Pokemon> pokemons;
 
     private final Map<Integer, PokemonType> pokedex;
 
@@ -27,7 +24,7 @@ public class Player extends Entity {
 
     protected Player(String name) {
         super(name);
-        this.pokemons = new ArrayList<>();
+        this.pokemons = new HashSet<>();
         this.pokedex = new HashMap<>();
     }
 
