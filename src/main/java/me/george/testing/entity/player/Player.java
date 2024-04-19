@@ -7,7 +7,10 @@ import me.george.testing.entity.Entity;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents a player that can own Pokémon slaves.
@@ -31,6 +34,36 @@ public class Player extends Entity {
     @Override
     public boolean save() {
         return true;
+    }
+
+    @Override
+    protected int[] getCachedExpRequirement() {
+        return new int[PlayerManager.MAX_LEVEL];
+    }
+
+    @Override
+    protected int getNeededExp(int level) {
+        if (level < 1)
+            level = 1;
+
+        int levelExp = getCachedExpRequirement()[level - 1];
+        if (levelExp > 0)
+            return levelExp;
+
+        if (level > 1) {
+            int lastLevel = level - 1;
+            levelExp = (int) (getNeededExp(lastLevel) + Math.pow(lastLevel, 2) + (lastLevel * 30));
+        } else {
+            levelExp = 500;
+        }
+
+        getCachedExpRequirement()[level - 1] = levelExp;
+        return levelExp;
+    }
+
+    @Override
+    protected boolean isMaxLevel() {
+        return getLevel() >= PlayerManager.MAX_LEVEL;
     }
 
     /**

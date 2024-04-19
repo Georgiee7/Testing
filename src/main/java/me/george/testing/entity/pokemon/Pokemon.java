@@ -46,6 +46,36 @@ public abstract class Pokemon extends Combatant {
         calculateStats();
     }
 
+    @Override
+    protected int getNeededExp(int level) {
+        if (level < 1)
+            level = 1;
+
+        int levelExp = getCachedExpRequirement()[level - 1];
+        if (levelExp > 0)
+            return levelExp;
+
+        if (level > 1) {
+            int lastLevel = level - 1;
+            levelExp = (int) (getNeededExp(lastLevel) + Math.pow(lastLevel, 2) + (lastLevel * 24) + 150);
+        } else {
+            levelExp = 176;
+        }
+
+        getCachedExpRequirement()[level - 1] = levelExp;
+        return levelExp;
+    }
+
+    @Override
+    protected int[] getCachedExpRequirement() {
+        return new int[PokemonManager.MAX_LEVEL];
+    }
+
+    @Override
+    protected boolean isMaxLevel() {
+        return getLevel() >= PokemonManager.MAX_LEVEL;
+    }
+
     /**
      * Gets the Pokémon's elements based on its type.
      *

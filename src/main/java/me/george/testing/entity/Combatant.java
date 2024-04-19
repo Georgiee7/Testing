@@ -26,8 +26,6 @@ public abstract class Combatant extends Entity {
         this.evs = new HashMap<>();
         this.permanentStats = permanentStats == null ? new PermanentStats() : permanentStats;
         setAlive(true);
-        setLevel(1);
-        setExp(0);
         if (!this.permanentStats.isInitialized())
             calculateStats();
     }

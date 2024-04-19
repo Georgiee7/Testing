@@ -3,7 +3,6 @@ package me.george.testing.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.parties.Party;
 
 import java.util.UUID;
@@ -14,7 +13,6 @@ import java.util.UUID;
  */
 @Getter
 public abstract class Entity {
-    private static final int[] CACHED_EXP_REQUIREMENT = new int[PokemonManager.MAX_LEVEL];
 
     private final UUID uuid;
 
@@ -27,10 +25,10 @@ public abstract class Entity {
     private int health;
 
     @Setter(AccessLevel.PROTECTED)
-    private int exp;
+    private int exp = 0;
 
     @Setter(AccessLevel.PROTECTED)
-    private int level;
+    private int level = 1;
 
     private Party party;
 
@@ -80,6 +78,13 @@ public abstract class Entity {
     }
 
     /**
+     * Gets a one dimensional array of exp requirements per level-set.
+     *
+     * @return expRequirementArray
+     */
+    protected abstract int[] getCachedExpRequirement();
+
+    /**
      * Gives exp to this entity, can proc level-up.
      * Uses a default formula, should be overridden if custom exp is desired.
      *
@@ -101,24 +106,7 @@ public abstract class Entity {
      * @param level The level to use as a reference.
      * @return neededExp
      */
-    protected int getNeededExp(int level) {
-        if (level < 1)
-            level = 1;
-
-        int levelExp = CACHED_EXP_REQUIREMENT[level - 1];
-        if (levelExp > 0)
-            return levelExp;
-
-        if (level > 1) {
-            int lastLevel = level - 1;
-            levelExp = (int) (getNeededExp(lastLevel) + Math.pow(lastLevel, 2) + (lastLevel * 24) + 150);
-        } else {
-            levelExp = 176;
-        }
-
-        CACHED_EXP_REQUIREMENT[level - 1] = levelExp;
-        return levelExp;
-    }
+    protected abstract int getNeededExp(int level);
 
     /**
      * Makes this entity level up if below the max level.
@@ -142,9 +130,7 @@ public abstract class Entity {
      *
      * @return isMaxLevel
      */
-    protected boolean isMaxLevel() {
-        return this.level >= PokemonManager.MAX_LEVEL;
-    }
+    protected abstract boolean isMaxLevel();
 
     /**
      * Adds the entity to a party.

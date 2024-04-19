@@ -20,6 +20,8 @@ public class PlayerManager extends Manager {
 
     private static final Pattern VALID_NAME_SYNTAX_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,16}$"); // Underscores, 3 chars min, 16 chars max, alphanumeric english characters.
 
+    public static final int MAX_LEVEL = 100;
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void onStop() {
