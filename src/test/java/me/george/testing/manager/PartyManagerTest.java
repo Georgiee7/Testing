@@ -3,11 +3,13 @@ package me.george.testing.manager;
 import me.george.testing.entity.Combatant;
 import me.george.testing.entity.player.Player;
 import me.george.testing.entity.player.PlayerManager;
+import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.entity.pokemon.PokemonType;
 import me.george.testing.parties.Party;
 import me.george.testing.parties.PartyManager;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -56,9 +58,18 @@ public class PartyManagerTest {
         MOCK_PLAYER_1_PARTY.getCombatants().forEach(combatant -> assertInstanceOf(Combatant.class, combatant));
     }
 
+    @BeforeEach
+    public void populatePlayerTeams() {
+        // Simulate the player having a team of combatants.
+        for (Combatant combatant : MOCK_PLAYER_1_TEAM)
+            if (combatant instanceof Pokemon pokemon)
+                MOCK_PLAYER_1.addPokemon(pokemon);
+    }
+
     @Test
     public void testAddToParty() {
         PartyManager.addToParty(MOCK_INVITED_PLAYER, MOCK_PLAYER_1_PARTY);
+
         assertTrue(MOCK_PLAYER_1_PARTY.isMember(MOCK_INVITED_PLAYER));
         assertEquals(5, MOCK_PLAYER_1_PARTY.getSize());
     }
@@ -68,7 +79,7 @@ public class PartyManagerTest {
         PartyManager.removeFromParty(MOCK_PLAYER_1, MOCK_PLAYER_1_PARTY);
         assertFalse(MOCK_PLAYER_1_PARTY.isMember(MOCK_PLAYER_1));
         assertTrue(MOCK_PLAYER_1_PARTY.isLeader(MOCK_PLAYER_1_TEAM_MATE));
-        assertEquals(3, MOCK_PLAYER_1_PARTY.getSize());
+        assertEquals(1, MOCK_PLAYER_1_PARTY.getSize());
     }
 
     @Test

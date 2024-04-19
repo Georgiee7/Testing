@@ -54,7 +54,7 @@ public class Party {
      *
      * @param entity The entity to remove.
      */
-    protected void removePlayer(Entity entity) {
+    protected void remove(Entity entity) {
         this.members.remove(entity);
     }
 

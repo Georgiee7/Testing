@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * A registry of permanent stats a Pokémon may have.
+ * A registry of permanent stats a combatant may have.
  * Created by George K. on 4/13/2024.
  */
 @AllArgsConstructor

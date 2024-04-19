@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * A wrapper around permanent stats a Pokémon may have.
+ * A wrapper around permanent stats a combatant may have.
  * Created by George K. on 4/13/2024.
  */
 @Getter

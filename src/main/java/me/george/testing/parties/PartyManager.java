@@ -4,6 +4,7 @@ import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
 import me.george.testing.entity.Combatant;
 import me.george.testing.entity.Entity;
+import me.george.testing.entity.player.Player;
 import me.george.testing.manager.Manager;
 import me.george.testing.utils.Utils;
 
@@ -93,13 +94,22 @@ public class PartyManager extends Manager {
                 return;
 
             if (p.isLeader(entity) && p.getSize() - 1 > 0)
-                setLeader(p, Utils.randElement(p.getNonCombatants())); // Prevent leadership from going to Pokémon.
+                setLeader(p, Utils.randElement(p.getNonCombatants().stream().filter(combatant -> !combatant.equals(entity)).toList())); // Prevent leadership from going to Pokémon.
 
-            p.removePlayer(entity);
-            entity.removeFromParty();
+            // Remove the entity's team along with the player.
+            if (entity instanceof Player player)
+                for (Combatant combatant : player.getPokemons())
+                    removeFromParty(combatant, p);
+
+            removeEntityFromParty(entity, p);
             if (p.isEmpty())
                 disbandParty(p);
         });
+    }
+
+    private static void removeEntityFromParty(Entity entity, Party party) {
+        party.remove(entity);
+        entity.removeFromParty();
     }
 
     /**
