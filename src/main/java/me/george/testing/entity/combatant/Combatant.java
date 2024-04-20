@@ -1,10 +1,11 @@
-package me.george.testing.entity;
+package me.george.testing.entity.combatant;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.entity.pokemon.stats.PermanentStat;
-import me.george.testing.entity.pokemon.stats.PermanentStats;
+import me.george.testing.entity.Entity;
+import me.george.testing.entity.combatant.stats.PermanentStat;
+import me.george.testing.entity.combatant.stats.PermanentStats;
 
 import java.util.HashMap;
 import java.util.Map;

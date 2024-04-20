@@ -1,11 +1,8 @@
-package me.george.testing.manager;
+package me.george.testing.entity.pokemon;
 
 import me.george.testing.entity.player.Player;
 import me.george.testing.entity.player.PlayerManager;
-import me.george.testing.entity.pokemon.Pokemon;
-import me.george.testing.entity.pokemon.PokemonManager;
-import me.george.testing.entity.pokemon.PokemonType;
-import me.george.testing.entity.pokemon.stats.PermanentStats;
+import me.george.testing.entity.combatant.stats.PermanentStats;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 

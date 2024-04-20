@@ -1,4 +1,4 @@
-package me.george.testing.entity.pokemon.stats;
+package me.george.testing.entity.combatant.stats;
 
 import lombok.Getter;
 

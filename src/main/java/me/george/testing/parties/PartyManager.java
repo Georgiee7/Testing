@@ -2,7 +2,7 @@ package me.george.testing.parties;
 
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
-import me.george.testing.entity.Combatant;
+import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.Entity;
 import me.george.testing.entity.player.Player;
 import me.george.testing.manager.Manager;

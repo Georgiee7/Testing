@@ -1,13 +1,11 @@
-package me.george.testing.manager;
+package me.george.testing.parties;
 
-import me.george.testing.entity.Combatant;
+import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.player.Player;
 import me.george.testing.entity.player.PlayerManager;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.entity.pokemon.PokemonType;
-import me.george.testing.parties.Party;
-import me.george.testing.parties.PartyManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

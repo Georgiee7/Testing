@@ -3,7 +3,7 @@ package me.george.testing.parties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.entity.Combatant;
+import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.Entity;
 
 import java.util.ArrayList;

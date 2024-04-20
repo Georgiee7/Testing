@@ -1,6 +1,6 @@
 package me.george.testing.entity.pokemon.types.t1.fire;
 
-import me.george.testing.entity.pokemon.stats.PermanentStats;
+import me.george.testing.entity.combatant.stats.PermanentStats;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonType;
 

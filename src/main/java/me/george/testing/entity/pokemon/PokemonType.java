@@ -1,9 +1,9 @@
 package me.george.testing.entity.pokemon;
 
 import lombok.Getter;
-import me.george.testing.entity.pokemon.stats.PermanentStats;
+import me.george.testing.entity.combatant.stats.PermanentStats;
 import me.george.testing.entity.pokemon.types.t1.fire.Charmander;
-import me.george.testing.entity.pokemon.stats.PermanentStat;
+import me.george.testing.entity.combatant.stats.PermanentStat;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,7 +1,5 @@
-package me.george.testing.manager;
+package me.george.testing.entity.player;
 
-import me.george.testing.entity.player.Player;
-import me.george.testing.entity.player.PlayerManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
