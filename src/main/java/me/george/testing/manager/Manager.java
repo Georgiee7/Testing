@@ -127,4 +127,15 @@ public class Manager {
     public void log(String message, Object... args) {
         Testing.logInfo(getName() + " - " + message, args);
     }
+
+    /**
+     * Logs a formatted message as a specific manager.
+     *
+     * @param managerClass The class of the manager to use as a logger source.
+     * @param message The message to log.
+     * @param args The optional arguments to format the message with.
+     */
+    public static <TManagerClass extends Manager> void log(Class<TManagerClass> managerClass, String message, Object args) {
+        Testing.logInfo(Utils.getSimpleName(managerClass) + " - " + message, args);
+    }
 }

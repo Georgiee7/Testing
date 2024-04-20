@@ -96,9 +96,7 @@ public class PartyManagerTest {
     }
 
     @AfterAll
-    public static void tearDown() {
-       PartyManager.getParties().forEach(PartyManager::disbandParty);
-       PlayerManager.getPlayers().forEach(PlayerManager::deleteData);
-       PokemonManager.getPokemons().forEach(PokemonManager::removePokemon);
+    public static void cleanupParties() {
+        PartyManager.disbandParties();
     }
 }

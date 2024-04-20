@@ -19,39 +19,51 @@ import java.util.function.Consumer;
 @Getter
 public class BattleManager extends Manager {
 
-    private static final Map<UUID, Battle> ACTIVE_BATTLES = new HashMap<>();
+    private static final Map<UUID, Battle> CACHED_BATTLES = new HashMap<>();
 
     @Override
     public void onStop() {
-        int battles = ACTIVE_BATTLES.size();
+        int battles = CACHED_BATTLES.size();
         Testing.logInfo("Stopping %d battles...", battles);
-        ACTIVE_BATTLES.values().forEach(Battle::stop);
+        CACHED_BATTLES.values().forEach(Battle::stop);
         Testing.logInfo("Stopped %d battles.", battles);
+    }
+
+    /**
+     * Creates a new battle between parties.
+     *
+     * @param parties The parties involved in the battle.
+     * @return newBattle
+     */
+    public static Battle createBattle(Collection<Party> parties) {
+        Utils.verifyNotNull(parties, "Tried to create a battle between invalid parties.");
+        Utils.verify(!parties.isEmpty(), "Tried to create a battle with no parties.");
+        Utils.verify(parties.size() >= 2, "Tried to create a battle with less than 2 parties.");
+
+        Battle battle = new Battle(parties);
+        CACHED_BATTLES.put(battle.getUuid(), battle);
+        return battle;
+    }
+
+    /**
+     * Creates and immediately starts a new battle between parties.
+     *
+     * @param parties The parties involved in the battle.
+     * @return newStartedBattle
+     */
+    public static Battle createAndStartBattle(Collection<Party> parties) {
+        Battle battle = createBattle(parties);
+        start(battle);
+        return battle;
     }
 
     /**
      * Starts a battle between parties.
      *
-     * @param parties The parties involved in the battle.
+     * @param battle The battle to start.
      */
-    public static void startBattle(Collection<Party> parties) {
-        Battle battle = new Battle(parties);
-        ACTIVE_BATTLES.put(battle.getUuid(), battle);
+    public static void start(Battle battle) {
         updateBattle(battle, Battle::start);
-    }
-
-    /**
-     * Updates a battle's state.
-     *
-     * @param battle The battle to update.
-     * @param battleConsumer The operation to perform on the battle.
-     */
-    public static void updateBattle(Battle battle, Consumer<Battle> battleConsumer) {
-        Utils.verifyNotNull(battle, "Tried to update an invalid battle.");
-        Utils.verifyNotNull(battleConsumer, "Tried to update a battle with an invalid consumer.");
-        Utils.verify(!battle.isFinished(), "Tried to update a finished battle.");
-
-        battleConsumer.accept(battle);
     }
 
     /**
@@ -88,5 +100,29 @@ public class BattleManager extends Manager {
      */
     public static void stop(Battle battle) {
         updateBattle(battle, Battle::stop);
+    }
+
+    private static void updateBattle(Battle battle, Consumer<Battle> battleConsumer) {
+        Utils.verifyNotNull(battle, "Tried to update an invalid battle.");
+        Utils.verifyNotNull(battleConsumer, "Tried to update a battle with an invalid consumer.");
+        Utils.verify(!battle.isFinished(), "Tried to update a finished battle.");
+
+        battleConsumer.accept(battle);
+    }
+
+    /**
+     * Gets all cached battles.
+     *
+     * @return cachedBattles
+     */
+    public static Collection<Battle> getBattles() {
+        return CACHED_BATTLES.values();
+    }
+
+    /**
+     * Stops all cached battles.
+     */
+    public static void stopBattles() {
+        getBattles().stream().filter(battle -> !battle.isFinished()).forEach(BattleManager::stop);
     }
 }

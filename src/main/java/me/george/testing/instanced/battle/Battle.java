@@ -8,6 +8,7 @@ import me.george.testing.entity.Entity;
 import me.george.testing.instanced.InstancedScenario;
 import me.george.testing.manager.Manager;
 import me.george.testing.parties.Party;
+import me.george.testing.utils.Utils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,21 +29,19 @@ public class Battle implements InstancedScenario {
 
     private Turn currentTurn;
 
-    @Setter(AccessLevel.PROTECTED)
-    private State state;
+    private State state = State.NOT_STARTED;
 
     private Party winner;
 
     @Setter(AccessLevel.PROTECTED)
     private boolean draw;
 
-    public Battle(Collection<Party> parties) {
+    protected Battle(Collection<Party> parties) {
         this.uuid = UUID.randomUUID();
         this.parties = (List<Party>) parties;
         this.turnQueue = new LinkedList<>();
         this.pastTurns = new ArrayList<>();
         this.draw = false;
-        start();
     }
 
     @Override
@@ -169,7 +168,7 @@ public class Battle implements InstancedScenario {
      * @param args    The arguments to format the message with.
      */
     protected void log(String message, Object... args) {
-        Manager.getInstance(BattleManager.class).log(message, args);
+        Manager.log(BattleManager.class, message, args);
     }
 
     /**
@@ -180,6 +179,15 @@ public class Battle implements InstancedScenario {
      */
     public boolean isState(State state) {
         return this.state == state;
+    }
+
+    /**
+     * Whether the battle has started or not.
+     *
+     * @return battleHasStarted
+     */
+    public boolean hasStarted() {
+        return !isState(State.NOT_STARTED);
     }
 
     /**
@@ -209,7 +217,21 @@ public class Battle implements InstancedScenario {
         return isState(State.FINISHED);
     }
 
+    /**
+     * Sets the battle's state to a new state.
+     *
+     * @param newState The new state to set the battle to.
+     */
+    protected void setState(State newState) {
+        Utils.verify(!newState.equals(State.NOT_STARTED), "Tried to set an initialized battle's state to '%s'", State.NOT_STARTED);
+        this.state = newState;
+    }
+
+    /**
+     * Possible states a battle may be in.
+     */
     public enum State {
+        NOT_STARTED,
         ACTIVE,
         PAUSED,
         FINISHED

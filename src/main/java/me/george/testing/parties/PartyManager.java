@@ -148,4 +148,11 @@ public class PartyManager extends Manager {
     public static Collection<Party> getParties() {
         return PARTIES_BY_UUID.getValues();
     }
+
+    /**
+     * Disbands all active parties.
+     */
+    public static void disbandParties() {
+        getParties().forEach(PartyManager::disbandParty);
+    }
 }
