@@ -60,7 +60,7 @@ public class PlayerManagerTest {
         assertTrue(PlayerManager.isValidPlayerName("asdf123"));
         assertFalse(PlayerManager.isValidPlayerName(""));
         assertFalse(PlayerManager.isValidPlayerName("12"));
-        assertFalse(PlayerManager.isValidPlayerName("Name_With_Spaces"));
+        assertFalse(PlayerManager.isValidPlayerName("Name With Spaces"));
         assertFalse(PlayerManager.isValidPlayerName("NameWith!Invalid@Chars"));
     }
 
