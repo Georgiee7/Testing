@@ -46,7 +46,10 @@ public class Battle implements InstancedScenario {
 
     @Override
     public void start() {
-        log("Started battle between the parties of: " + this.parties.stream().map(party -> party.getLeader().getName()).collect(Collectors.joining(", ")));
+        log("Starting battle between the parties of: " + this.parties.stream()
+                .map(party -> party.getLeader().getName())
+                .collect(Collectors.joining(", ")));
+
         setState(State.ACTIVE);
         initializeTurnQueue();
         processNextTurn();
@@ -72,11 +75,12 @@ public class Battle implements InstancedScenario {
             this.draw = true;
 
         setState(State.FINISHED);
-        log(!this.draw ? "Battle finished with winning party: " + this.winner.getMembers()
+        log((!this.draw ? "Battle finished with winning party:\n" + this.winner.getMembers()
                 .stream()
                 .map(Entity::getName)
                 .collect(Collectors.joining(", "))
-                : "The battle ended in a draw.");
+                : "The battle ended in a draw.")
+                + "\nTotal Turns: " + getTotalTurns());
     }
 
     private void initializeTurnQueue() {
@@ -148,7 +152,7 @@ public class Battle implements InstancedScenario {
      * @return totalTurns
      */
     protected int getTotalTurns() {
-        return this.turnQueue.size();
+        return this.pastTurns.size();
     }
 
     /**
