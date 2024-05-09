@@ -517,4 +517,49 @@ public class Utils {
     public static boolean isNegative(double num) {
         return Double.compare(num, 0.0) < 0;
     }
+
+    /**
+     * Check if a random chance succeeds.
+     *
+     * @param chance 1 / chance = the % chance.
+     * @return success
+     */
+    public static boolean randChance(int chance) {
+        return chance <= 1 || nextInt(chance) == 0;
+    }
+
+    /**
+     * Random percentage value based on 0-100.
+     * The higher the number, the higher your chance. On average, if you selected '2', every 2/100 times this function would return true.
+     * If you supply zero, it will never return true.
+     *
+     * @param chance The chance between 1 and 100.
+     * @return randChance
+     */
+    public static boolean randChanceInt100(int chance) {
+        if (chance < 0 || chance > 100)
+            throw new GeneralException("Chance was out of range [0,100]. (Provided: %d)", chance);
+        return nextInt(100) + 1 <= chance;
+    }
+
+    /**
+     * Random chance based on a double value.
+     * The closer the input is to zero, the lower the chance. The higher, the higher.
+     *
+     * @param chance The chance between 0 and 1.
+     * @return randChance
+     */
+    public static boolean randChance(double chance) {
+        return nextDouble() < chance;
+    }
+
+    /**
+     * Gets an input and turns it into a percent
+     *
+     * @param input to be turned int percent
+     * @return percent form
+     */
+    public static double getAsPercent(int input) {
+        return ((double) input / 100.0);
+    }
 }

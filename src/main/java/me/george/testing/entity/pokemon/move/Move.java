@@ -2,8 +2,9 @@ package me.george.testing.entity.pokemon.move;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.pokemon.Element;
-import me.george.testing.entity.pokemon.Pokemon;
+import me.george.testing.utils.Utils;
 
 /**
  * Represents a move that can be performed by Pokémon, that consists of a particular element.
@@ -19,12 +20,15 @@ public abstract class Move {
     @Setter
     private boolean undodgeable = false;
 
-    private final Pokemon caster;
+    private final Combatant caster;
 
     @Setter
     private float accuracy;
 
-    protected Move(MoveType type, Pokemon caster) {
+    @Setter
+    private float successRate = 100F;
+
+    protected Move(MoveType type, Combatant caster) {
         this.type = type;
         this.name = type.getName();
         this.caster = caster;
@@ -33,7 +37,7 @@ public abstract class Move {
     /**
      * Executes the mechanics of the move.
      */
-    protected abstract void execute();
+    protected abstract boolean execute();
 
     /**
      * Attempts to perform the move.
@@ -41,10 +45,13 @@ public abstract class Move {
      * @return moveSuccessfullyPerformed
      */
     public final boolean perform() {
-        execute();
+        return execute() && rollSuccessRate();
         // calculateAccuracy();
         // TODO: Cater to mechanics that may cause a move to fail (randomness involved in moves, lack of skill, etc.).
-        return true;
+    }
+
+    private boolean rollSuccessRate() {
+        return Utils.randFloat(this.successRate, 100F) >= this.successRate;
     }
 
     /**

@@ -2,7 +2,7 @@ package me.george.testing.manager;
 
 import me.george.testing.entity.pokemon.Element;
 import me.george.testing.entity.pokemon.Pokemon;
-import me.george.testing.entity.pokemon.move.DamageMove;
+import me.george.testing.entity.pokemon.move.DamagingMove;
 import me.george.testing.entity.pokemon.move.Move;
 
 /**
@@ -28,8 +28,8 @@ public class CombatManager extends Manager {
      * @return calculatedDamage
      */
     public static int calculateDamage(Move move, Pokemon pokemon) {
-        return move instanceof DamageMove
-                ? (int) (((DamageMove) move).getDamage() * calculateEffectivenessModifier(move.getElement(), pokemon.getElements()))
+        return move instanceof DamagingMove
+                ? (int) (((DamagingMove) move).calculateDamage(move.getType()) * calculateEffectivenessModifier(move.getElement(), pokemon.getElements()))
                 : 0;
     }
 
