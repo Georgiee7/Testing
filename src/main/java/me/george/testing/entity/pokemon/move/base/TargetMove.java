@@ -1,8 +1,9 @@
-package me.george.testing.entity.pokemon.move;
+package me.george.testing.entity.pokemon.move.base;
 
 import lombok.Getter;
 import lombok.Setter;
 import me.george.testing.entity.combatant.Combatant;
+import me.george.testing.entity.pokemon.move.MoveType;
 import me.george.testing.utils.Utils;
 
 /**

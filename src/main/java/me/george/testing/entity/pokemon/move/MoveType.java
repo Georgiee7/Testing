@@ -3,6 +3,7 @@ package me.george.testing.entity.pokemon.move;
 import lombok.Getter;
 import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.pokemon.Element;
+import me.george.testing.entity.pokemon.move.base.Move;
 import me.george.testing.entity.pokemon.move.moves.MoveTackle;
 
 import java.util.function.BiFunction;

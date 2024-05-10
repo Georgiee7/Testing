@@ -2,9 +2,9 @@ package me.george.testing.entity.pokemon.move.moves;
 
 import me.george.testing.Testing;
 import me.george.testing.entity.combatant.Combatant;
-import me.george.testing.entity.pokemon.move.DamagingMove;
+import me.george.testing.entity.pokemon.move.base.DamagingMove;
 import me.george.testing.entity.pokemon.move.MoveType;
-import me.george.testing.entity.pokemon.move.TargetMove;
+import me.george.testing.entity.pokemon.move.base.TargetMove;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

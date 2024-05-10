@@ -1,9 +1,10 @@
-package me.george.testing.entity.pokemon.move;
+package me.george.testing.entity.pokemon.move.base;
 
 import lombok.Getter;
 import lombok.Setter;
 import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.pokemon.Element;
+import me.george.testing.entity.pokemon.move.MoveType;
 import me.george.testing.utils.Utils;
 
 /**
@@ -21,9 +22,6 @@ public abstract class Move {
     private boolean undodgeable = false;
 
     private final Combatant caster;
-
-    @Setter
-    private float accuracy;
 
     @Setter
     private float successRate = 100F;
