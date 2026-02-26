@@ -3,6 +3,8 @@ package me.george.testing.entity.player;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,22 +52,44 @@ public class Player extends Entity {
         this(null, name);
     }
 
-    @JsonProperty("pokemonUuids")
+    /**
+     * JSON getter used by Jackson during serialization.
+     * Returns the UUIDs of Pokémon this player currently owns. The actual in-memory
+     * Pokémon instances are stored in {@link #pokemons} and are not serialized directly.
+     */
+    @JsonGetter("pokemonUuids")
+    @SuppressWarnings("unused")
     public List<UUID> getPokemonUuidsForSerialization() {
-        List<UUID> uuids = new ArrayList<>();
-        for (Pokemon p : this.pokemons)
-            uuids.add(p.getUuid());
+         List<UUID> uuids = new ArrayList<>();
+         for (Pokemon p : this.pokemons)
+             uuids.add(p.getUuid());
 
-        return uuids;
-    }
+         return uuids;
+     }
 
-    @JsonProperty("pokemonUuids")
+    /**
+     * JSON setter used by Jackson during deserialization.
+     * Jackson will populate the persisted UUID list here; the actual {@link #pokemons}
+     * set is re-linked to in-memory Pokemon instances by Manager.relinkPersistentEntities().
+     */
+    @JsonSetter("pokemonUuids")
+    @SuppressWarnings("unused")
     public void setPokemonUuidsForDeserialization(List<UUID> uuids) {
         this.persistedPokemonUuids = (uuids == null) ? new ArrayList<>() : new ArrayList<>(uuids);
     }
 
     public List<UUID> getPersistedPokemonUuids() {
         return Collections.unmodifiableList(this.persistedPokemonUuids);
+    }
+
+    /**
+     * Clears the persisted UUID list that was populated by Jackson during deserialization.
+     * This should be called after relinking persisted UUIDs to in-memory Pokemon instances so
+     * the next serialization uses the live {@link #pokemons} set.
+     */
+    @SuppressWarnings("unused")
+    public void clearPersistedPokemonUuids() {
+        this.persistedPokemonUuids = new ArrayList<>();
     }
 
     @Override

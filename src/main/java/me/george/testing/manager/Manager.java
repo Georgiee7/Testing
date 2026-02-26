@@ -81,29 +81,75 @@ public class Manager {
     public static void relinkPersistentEntities() {
         try {
             Collection<Pokemon> pokemons = PokemonManager.getPokemons();
+            int totalPokemons = pokemons.size();
+            int linkedFromOwner = 0;
+            List<UUID> missingOwners = new ArrayList<>();
+
             for (Pokemon p : pokemons) {
                 UUID ownerUuid = p.getOwnerUuid();
                 if (ownerUuid != null) {
                     Player owner = PlayerManager.getPlayer(ownerUuid);
-                    if (owner != null && !owner.hasPokemon(p)) {
+                    if (owner != null) {
+                        if (!owner.hasPokemon(p))
+                            owner.addPokemon(p);
+
                         p.setOwner(owner);
-                        owner.addPokemon(p);
+                        linkedFromOwner++;
+                    } else {
+                        missingOwners.add(ownerUuid);
                     }
                 }
             }
 
-            // Restore player's pokemon lists from persisted UUIDs (in case players declared pokemon lists).
             Collection<Player> players = PlayerManager.getPlayers();
+            int totalPlayers = players.size();
+            int linkedFromPlayerUuids = 0;
+            List<UUID> missingPokemons = new ArrayList<>();
+            int duplicateOwnerConflicts = 0;
+
             for (Player pl : players) {
                 List<UUID> uuids = pl.getPersistedPokemonUuids();
-                for (var uuid : uuids) {
+                if (uuids == null || uuids.isEmpty())
+                    continue;
+
+                for (UUID uuid : uuids) {
                     Pokemon p = PokemonManager.getPokemon(uuid);
-                    if (p != null && !pl.hasPokemon(p)) {
+                    if (p == null) {
+                        missingPokemons.add(uuid);
+                        continue;
+                    }
+
+                    if (!pl.hasPokemon(p)) {
                         pl.addPokemon(p);
+                        linkedFromPlayerUuids++;
+                    }
+
+                    // If the pokemon already had a different owner, log a conflict.
+                    Player currentOwner = p.getOwner();
+                    if (currentOwner == null) {
+                        p.setOwner(pl);
+                    } else if (!currentOwner.getUuid().equals(pl.getUuid())) {
+                        duplicateOwnerConflicts++;
+                        Testing.warn("Relinker: pokemon %s already owned by %s; assigning to %s in memory (no disk change)", p.getUuid(), currentOwner.getName(), pl.getName());
                         p.setOwner(pl);
                     }
                 }
+
+                // Clear persisted list after we've reattached runtime instances so serialization uses live set next time.
+                try {
+                    pl.clearPersistedPokemonUuids();
+                } catch (Throwable t) {
+                    // shouldn't happen but log defensively.
+                    Testing.warn("Failed to clear persisted pokemon UUIDs for player %s: %s", pl.getUuid(), t.getMessage());
+                }
             }
+
+            Testing.logInfo("Relinker summary: %d pokemons scanned, %d linked from ownerUuid, %d players scanned, %d linked from player lists, %d missing owner UUIDs, %d missing pokemon UUIDs, %d owner conflicts", totalPokemons, linkedFromOwner, totalPlayers, linkedFromPlayerUuids, missingOwners.size(), missingPokemons.size(), duplicateOwnerConflicts);
+            if (!missingOwners.isEmpty())
+                Testing.warn("Missing owners for %d ownerUuid(s): %s", missingOwners.size(), missingOwners);
+
+            if (!missingPokemons.isEmpty())
+                Testing.warn("Missing pokemons for %d pokemonUuid(s) referenced by players: %s", missingPokemons.size(), missingPokemons);
         } catch (Throwable th) {
             Testing.warn("Failed to relink Pokemon owners: %s", th.getMessage());
         }
