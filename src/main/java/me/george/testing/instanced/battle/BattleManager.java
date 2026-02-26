@@ -6,12 +6,12 @@ import me.george.testing.manager.Manager;
 import me.george.testing.utils.Utils;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Handles battle-related mechanics.
@@ -19,7 +19,7 @@ import java.util.Collections;
  */
 public class BattleManager extends Manager {
 
-    private static final Map<UUID, Battle> CACHED_BATTLES = new HashMap<>();
+    private static final Map<UUID, Battle> CACHED_BATTLES = new ConcurrentHashMap<>();
 
     @Override
     public void onStop() {

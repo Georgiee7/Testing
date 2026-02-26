@@ -38,6 +38,8 @@ public class PartyManager extends Manager {
      * @return newParty
      */
     public static Party createParty(Collection<Entity> entities, Collection<Combatant> combatants) {
+        Utils.verifyNotNull(entities, "Tried to create a party with null entities.");
+        Utils.verify(!entities.isEmpty(), "Tried to create a party with no entities.");
         return createParty(entities, combatants, Utils.randElement(entities));
     }
 
@@ -93,8 +95,12 @@ public class PartyManager extends Manager {
             if (!p.isMember(entity))
                 return;
 
-            if (p.isLeader(entity) && p.getSize() - 1 > 0)
-                setLeader(p, Utils.randElement(p.getNonCombatants().stream().filter(combatant -> !combatant.equals(entity)).toList())); // Prevent leadership from going to Pokémon.
+            if (p.isLeader(entity) && p.getSize() - 1 > 0) {
+                List<Entity> candidateList = p.getNonCombatants().stream().filter(combatant -> !combatant.equals(entity)).toList();
+                Entity newLeader = Utils.randElement(candidateList);
+                if (newLeader != null)
+                    setLeader(p, newLeader); // Prevent leadership from going to Pokémon.
+            }
 
             // Remove the entity's team along with the player.
             if (entity instanceof Player player)

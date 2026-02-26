@@ -18,11 +18,11 @@ public class GeneralException extends RuntimeException {
     }
 
     public GeneralException(String alert, Object... args) {
-        this(Utils.formatStringSafely(alert));
+        this(null, Utils.formatStringSafely(alert, args));
     }
 
     public GeneralException(Throwable e, String alert, Object... args) {
-        this(e, Utils.formatStringSafely(alert));
+        this(e, Utils.formatStringSafely(alert, args));
     }
 
     public GeneralException(Throwable cause, String alert) {

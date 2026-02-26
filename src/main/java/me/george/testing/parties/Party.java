@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Represents a team/party that consists of players, which have their own teams of Pokémon.
  * Created by George K. on 4/14/2024.
  */
 public class Party {
-
     private final List<Entity> members;
 
     @Getter
@@ -24,7 +24,7 @@ public class Party {
     private Entity leader;
 
     protected Party(Collection<Entity> members, Collection<Combatant> combatants, Entity leader) {
-        this.members = new ArrayList<>(members);
+        this.members = new CopyOnWriteArrayList<>(members == null ? List.of() : members);
         if (combatants == null)
             combatants = new ArrayList<>();
 

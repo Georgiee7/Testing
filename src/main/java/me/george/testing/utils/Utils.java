@@ -4,7 +4,14 @@ import me.george.testing.Testing;
 import me.george.testing.entity.pokemon.PokemonManager;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.IllegalFormatException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -291,7 +298,7 @@ public class Utils {
      *
      * @return randomLong
      */
-    public static double nextLong() {
+    public static long nextLong() {
         return getRandom().nextLong();
     }
 

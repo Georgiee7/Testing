@@ -10,7 +10,12 @@ import me.george.testing.manager.Manager;
 import me.george.testing.parties.Party;
 import me.george.testing.utils.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 /**
@@ -25,22 +30,22 @@ public class Battle implements InstancedScenario {
 
     private final List<Party> parties;
     private final Queue<Entity> turnQueue;
-    private final List<Turn> pastTurns;
+    private final Queue<Turn> pastTurns;
 
-    private Turn currentTurn;
+    private volatile Turn currentTurn;
 
-    private State state = State.NOT_STARTED;
+    private volatile State state = State.NOT_STARTED;
 
-    private Party winner;
+    private volatile Party winner;
 
     @Setter(AccessLevel.PROTECTED)
-    private boolean draw;
+    private volatile boolean draw;
 
     protected Battle(Collection<Party> parties) {
         this.uuid = UUID.randomUUID();
         this.parties = new ArrayList<>(parties);
-        this.turnQueue = new LinkedList<>();
-        this.pastTurns = new ArrayList<>();
+        this.turnQueue = new ConcurrentLinkedQueue<>();
+        this.pastTurns = new ConcurrentLinkedQueue<>();
         this.draw = false;
     }
 
@@ -120,8 +125,7 @@ public class Battle implements InstancedScenario {
 
         if (opponentParty != null) {
             List<Entity> opponentEntities = opponentParty.getMembers();
-            Random random = new Random();
-            return opponentEntities.get(random.nextInt(opponentEntities.size()));
+            return Utils.randElement(opponentEntities);
         }
 
         return null;

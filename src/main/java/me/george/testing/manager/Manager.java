@@ -8,21 +8,19 @@ import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.utils.ReflectionUtil;
 import me.george.testing.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents a base manager responsible for the handling of a system.
  * Created by George K. on 4/13/2024.
  */
 public class Manager {
-
-    private static final List<Manager> managers = new ArrayList<>();
-
-    private static final Map<Class<? extends Manager>, Manager> INSTANCE_MAP = new HashMap<>();
+    private static final List<Manager> managers = new CopyOnWriteArrayList<>();
+    private static final Map<Class<? extends Manager>, Manager> INSTANCE_MAP = new ConcurrentHashMap<>();
 
     /**
      * Method to be called when the program starts.
@@ -102,10 +100,10 @@ public class Manager {
      * @param m The manager instance to add.
      */
     public static void addManager(Manager m) {
-        Utils.verify(getInstance(m.getClass()) == null, "%s is already registered!", m.getName());
+        Manager existing = INSTANCE_MAP.putIfAbsent(m.getClass(), m);
+        Utils.verify(existing == null, "%s is already registered!", m.getName());
 
         managers.add(m);
-        INSTANCE_MAP.put(m.getClass(), m);
     }
 
     /**

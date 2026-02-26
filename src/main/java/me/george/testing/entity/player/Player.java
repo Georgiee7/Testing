@@ -7,10 +7,11 @@ import me.george.testing.entity.Entity;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonType;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Represents a player that can own Pokémon slaves.
@@ -20,15 +21,15 @@ import java.util.Set;
 public class Player extends Entity {
     private final Set<Pokemon> pokemons;
 
-    private final Map<Integer, PokemonType> pokedex;
+    private final ConcurrentMap<Integer, PokemonType> pokedex;
 
     @Setter(AccessLevel.PROTECTED)
     private Pokemon activePokemon;
 
     protected Player(String name) {
         super(name);
-        this.pokemons = new HashSet<>();
-        this.pokedex = new HashMap<>();
+        this.pokemons = ConcurrentHashMap.newKeySet();
+        this.pokedex = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -128,5 +129,23 @@ public class Player extends Entity {
      */
     public boolean hasUnlocked(PokemonType type) {
         return this.pokedex.containsValue(type);
+    }
+
+    /**
+     * Returns an unmodifiable view of the player's pokemons to protect internal state.
+     *
+     * @return pokemons
+     */
+    public Set<Pokemon> getPokemons() {
+        return Collections.unmodifiableSet(this.pokemons);
+    }
+
+    /**
+     * Returns an unmodifiable view of the player's pokedex to protect internal state.
+     *
+     * @return pokedex
+     */
+    public Map<Integer, PokemonType> getPokedex() {
+        return Collections.unmodifiableMap(this.pokedex);
     }
 }
