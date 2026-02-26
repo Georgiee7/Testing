@@ -1,5 +1,6 @@
 package me.george.testing.entity.combatant;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,6 @@ import java.util.Map;
  */
 @Getter
 public abstract class Combatant extends Entity {
-
     private final PermanentStats permanentStats;
 
     @Setter(AccessLevel.PROTECTED)
@@ -43,6 +43,7 @@ public abstract class Combatant extends Entity {
      *
      * @return baseStats
      */
+    @JsonIgnore
     public abstract Map<PermanentStat, Integer> getBaseStats();
 
     /**
@@ -61,6 +62,7 @@ public abstract class Combatant extends Entity {
         calculateStats();
     }
 
+    @JsonIgnore
     private int getTotalEVs() {
         return this.evs.values().stream().mapToInt(Integer::intValue).sum();
     }
@@ -70,6 +72,7 @@ public abstract class Combatant extends Entity {
      *
      * @return hp
      */
+    @JsonIgnore
     public int getHP() {
         return getStat(PermanentStat.HP);
     }
@@ -99,6 +102,7 @@ public abstract class Combatant extends Entity {
      *
      * @return attack
      */
+    @JsonIgnore
     public int getAttack() {
         return getStat(PermanentStat.ATK);
     }
@@ -108,6 +112,7 @@ public abstract class Combatant extends Entity {
      *
      * @return specialAttack
      */
+    @JsonIgnore
     public int getSpAttack() {
         return getStat(PermanentStat.SP_ATK);
     }
@@ -117,6 +122,7 @@ public abstract class Combatant extends Entity {
      *
      * @return defense
      */
+    @JsonIgnore
     public int getDefense() {
         return getStat(PermanentStat.DEF);
     }
@@ -126,6 +132,7 @@ public abstract class Combatant extends Entity {
      *
      * @return specialDefense
      */
+    @JsonIgnore
     public int getSpDefense() {
         return getStat(PermanentStat.SP_DEF);
     }
@@ -135,6 +142,7 @@ public abstract class Combatant extends Entity {
      *
      * @return speed
      */
+    @JsonIgnore
     public int getSpeed() {
         return getStat(PermanentStat.SPEED);
     }

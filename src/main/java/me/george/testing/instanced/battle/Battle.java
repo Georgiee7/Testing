@@ -1,5 +1,6 @@
 package me.george.testing.instanced.battle;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,17 +26,22 @@ import java.util.stream.Collectors;
  */
 @Getter
 public class Battle implements InstancedScenario {
-
     private final UUID uuid;
 
     private final List<Party> parties;
+
+    @JsonIgnore
     private final Queue<Entity> turnQueue;
+
+    @JsonIgnore
     private final Queue<Turn> pastTurns;
 
+    @JsonIgnore
     private volatile Turn currentTurn;
 
     private volatile State state = State.NOT_STARTED;
 
+    @JsonIgnore
     private volatile Party winner;
 
     @Setter(AccessLevel.PROTECTED)
@@ -155,6 +161,7 @@ public class Battle implements InstancedScenario {
      *
      * @return totalTurns
      */
+    @JsonIgnore
     protected int getTotalTurns() {
         return this.pastTurns.size();
     }
@@ -194,6 +201,7 @@ public class Battle implements InstancedScenario {
      *
      * @return battleHasStarted
      */
+    @JsonIgnore
     public boolean hasStarted() {
         return !isState(State.NOT_STARTED);
     }
@@ -203,6 +211,7 @@ public class Battle implements InstancedScenario {
      *
      * @return battleIsActive
      */
+    @JsonIgnore
     public boolean isActive() {
         return isState(State.ACTIVE);
     }
@@ -212,6 +221,7 @@ public class Battle implements InstancedScenario {
      *
      * @return battleIsPaused
      */
+    @JsonIgnore
     public boolean isPaused() {
         return isState(State.PAUSED);
     }
@@ -221,6 +231,7 @@ public class Battle implements InstancedScenario {
      *
      * @return battleIsFinished
      */
+    @JsonIgnore
     public boolean isFinished() {
         return isState(State.FINISHED);
     }

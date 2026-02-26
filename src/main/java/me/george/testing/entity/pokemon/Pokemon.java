@@ -1,5 +1,7 @@
 package me.george.testing.entity.pokemon;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +12,7 @@ import me.george.testing.entity.player.Player;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -23,8 +26,14 @@ public abstract class Pokemon extends Combatant {
     @Setter(AccessLevel.PROTECTED)
     private boolean shiny = false;
 
-    @Setter(AccessLevel.PROTECTED)
+    @JsonIgnore
+    @Setter
     private Player owner;
+
+    // Persist owner relationship by storing the owner's UUID. This avoids circular
+    // object graphs while still allowing us to re-link on startup.
+    @JsonProperty("ownerUuid")
+    private UUID ownerUuid;
 
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         super(type.getName(), permanentStats);
@@ -33,6 +42,16 @@ public abstract class Pokemon extends Combatant {
 
     protected Pokemon(PokemonType type) {
         this(type, null);
+    }
+
+    @JsonProperty("ownerUuid")
+    public UUID getOwnerUuid() {
+        return (this.owner != null) ? this.owner.getUuid() : this.ownerUuid;
+    }
+
+    @JsonProperty("ownerUuid")
+    public void setOwnerUuid(UUID ownerUuid) {
+        this.ownerUuid = ownerUuid;
     }
 
     @Override
@@ -81,6 +100,7 @@ public abstract class Pokemon extends Combatant {
      *
      * @return elements
      */
+    @JsonIgnore
     public Element[] getElements() {
         return this.type.getElements();
     }
@@ -135,6 +155,7 @@ public abstract class Pokemon extends Combatant {
      *
      * @return pokemonOwned
      */
+    @JsonIgnore
     public boolean hasOwner() {
         return this.owner != null;
     }

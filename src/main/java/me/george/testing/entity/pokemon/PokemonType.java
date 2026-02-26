@@ -1,9 +1,10 @@
 package me.george.testing.entity.pokemon;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import me.george.testing.entity.combatant.stats.PermanentStat;
 import me.george.testing.entity.combatant.stats.PermanentStats;
 import me.george.testing.entity.pokemon.types.t1.fire.Charmander;
-import me.george.testing.entity.combatant.stats.PermanentStat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -256,11 +257,15 @@ public enum PokemonType {
 
     private final int pokedexId;
     private final String name;
+    @JsonIgnore
     private final Map<PermanentStat, Integer> baseStats;
     private final float height; // in meters
     private final float weight; // in kg
+    @JsonIgnore
     private final Function<PermanentStats, Pokemon> maker;
+    @JsonIgnore
     private final PokemonType[] evolutions;
+    @JsonIgnore
     private final Element[] elements;
 
     PokemonType(int pokedexId, String name, Map<PermanentStat, Integer> baseStats, float height, float weight, Function<PermanentStats, Pokemon> maker, PokemonType[] evolutions, Element... elements) {

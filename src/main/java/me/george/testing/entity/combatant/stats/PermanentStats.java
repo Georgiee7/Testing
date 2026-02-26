@@ -1,5 +1,8 @@
 package me.george.testing.entity.combatant.stats;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 import java.util.Collections;
@@ -26,11 +29,15 @@ public class PermanentStats {
     public static final int MAX_IV_ROLL = 31;
 
     private final Map<PermanentStat, Integer> stats;
+
+    @JsonIgnore
     private boolean initialized;
 
+    @JsonIgnore
     private StatsCalculator calculator = new DefaultStatsCalculator();
 
-    public PermanentStats(Map<PermanentStat, Integer> stats) {
+    @JsonCreator
+    public PermanentStats(@JsonProperty("stats") Map<PermanentStat, Integer> stats) {
         if (stats instanceof EnumMap) {
             this.stats = new EnumMap<>((EnumMap<PermanentStat, Integer>) stats);
         } else if (stats != null) {

@@ -1,16 +1,17 @@
 package me.george.testing.manager;
 
 import me.george.testing.Testing;
+import me.george.testing.data.storage.supported.PersistenceManager;
+import me.george.testing.entity.player.Player;
 import me.george.testing.entity.player.PlayerManager;
+import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.instanced.battle.BattleManager;
 import me.george.testing.parties.PartyManager;
 import me.george.testing.utils.ReflectionUtil;
 import me.george.testing.utils.Utils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -45,10 +46,13 @@ public class Manager {
         addManager(CombatManager.class);
         addManager(BattleManager.class);
         addManager(PartyManager.class);
+        addManager(PersistenceManager.class);
     }
 
     /**
      * Enables all managers after registering them, executing their starting hook.
+     * This method registers the built-in managers, invokes their {@link #onStart()} hooks and
+     * then performs inter-manager relinking (for example restoring Pokemon owner relationships).
      */
     public static void registerManagers() {
         Testing.logInfo("Registering managers...");
@@ -58,11 +62,57 @@ public class Manager {
             manager.onStart();
         }
 
+        // Perform cross-manager linking after startup
+        relinkPersistentEntities();
+
         Testing.logInfo("Registered %d managers.", getManagers().size());
     }
 
     /**
+     * Re-links persisted entities loaded from disk across managers.
+     * <p>
+     * This method will:
+     * <ul>
+     *     <li>Set each {@link Pokemon}'s in-memory owner reference from its persisted owner UUID (if present).</li>
+     *     <li>Attach Pokémon instances to {@link Player} objects based on player's persisted pokemon UUID lists.</li>
+     * </ul>
+     * It's safe to call after managers have loaded their persisted state.
+     */
+    public static void relinkPersistentEntities() {
+        try {
+            Collection<Pokemon> pokemons = PokemonManager.getPokemons();
+            for (Pokemon p : pokemons) {
+                UUID ownerUuid = p.getOwnerUuid();
+                if (ownerUuid != null) {
+                    Player owner = PlayerManager.getPlayer(ownerUuid);
+                    if (owner != null && !owner.hasPokemon(p)) {
+                        p.setOwner(owner);
+                        owner.addPokemon(p);
+                    }
+                }
+            }
+
+            // Restore player's pokemon lists from persisted UUIDs (in case players declared pokemon lists).
+            Collection<Player> players = PlayerManager.getPlayers();
+            for (Player pl : players) {
+                List<UUID> uuids = pl.getPersistedPokemonUuids();
+                for (var uuid : uuids) {
+                    Pokemon p = PokemonManager.getPokemon(uuid);
+                    if (p != null && !pl.hasPokemon(p)) {
+                        pl.addPokemon(p);
+                        p.setOwner(pl);
+                    }
+                }
+            }
+        } catch (Throwable th) {
+            Testing.warn("Failed to relink Pokemon owners: %s", th.getMessage());
+        }
+    }
+
+    /**
      * Disables all managers after executing their disabling hook.
+     * <p>
+     * This will call {@link #onStop()} for each registered manager and then clear nothing else.
      */
     public static void disableManagers() {
         Testing.logInfo("Disabling managers...");
@@ -78,7 +128,8 @@ public class Manager {
      * Get a manager's instance from its class.
      *
      * @param managerClass The class of the manager to get an instance of.
-     * @return moduleInstance
+     * @param <T>          The manager type.
+     * @return the manager instance or null if none registered
      */
     @SuppressWarnings("unchecked")
     public static <T extends Manager> T getInstance(Class<T> managerClass) {
@@ -87,6 +138,9 @@ public class Manager {
 
     /**
      * Register a manager class.
+     * This constructs an instance of the provided manager class and registers it with the
+     * central manager list. The manager's {@link #onStart()} will be invoked when
+     * {@link #registerManagers()} is called.
      *
      * @param managerClass The manager class to register.
      */
@@ -95,7 +149,7 @@ public class Manager {
     }
 
     /**
-     * Register a manager.
+     * Register a manager instance.
      *
      * @param m The manager instance to add.
      */

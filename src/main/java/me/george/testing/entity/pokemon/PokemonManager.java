@@ -2,6 +2,7 @@ package me.george.testing.entity.pokemon;
 
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
+import me.george.testing.data.storage.supported.PokemonFileRepository;
 import me.george.testing.entity.player.Player;
 import me.george.testing.entity.combatant.stats.PermanentStats;
 import me.george.testing.manager.Manager;
@@ -18,7 +19,6 @@ import java.util.regex.Pattern;
  * Created by George K. on 4/13/2024.
  */
 public class PokemonManager extends Manager {
-
     private static final InMemoryCache<UUID, Pokemon> POKEMON_BY_UUID = new InMemoryCache<>();
 
     private static final Pattern VALID_NAME_SYNTAX_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,12}$"); // Underscores, 3 chars min, 12 chars max, alphanumeric english characters.
@@ -26,8 +26,17 @@ public class PokemonManager extends Manager {
     public static final int MAX_LEVEL = 100;
 
     @Override
+    public void onStart() {
+        Testing.logInfo("Loading pokemons from disk...");
+        Collection<Pokemon> pokemons = PokemonFileRepository.loadAll();
+        pokemons.forEach(p -> POKEMON_BY_UUID.put(p.getUuid(), p));
+        Testing.logInfo("Loaded %d Pokemon.", POKEMON_BY_UUID.size());
+    }
+
+    @Override
     public void onStop() {
         Testing.logInfo("Unloading %d Pokemon", POKEMON_BY_UUID.size());
+        getPokemons().forEach(PokemonFileRepository::save);
         POKEMON_BY_UUID.clear();
     }
 
@@ -44,18 +53,18 @@ public class PokemonManager extends Manager {
 
         Pokemon pokemon = type.getMaker().apply(stats);
         POKEMON_BY_UUID.put(pokemon.getUuid(), pokemon);
+        PokemonFileRepository.save(pokemon);
         return pokemon;
     }
 
     /**
-     * Sets a player as a Pokémon's owner.
+     * Sets a player as a Pokémon's owner and persists the change.
      *
      * @param pokemon The Pokémon to set the owner of.
      * @param player  The new Pokémon's owner.
      */
     public static void setPokemonOwner(Pokemon pokemon, Player player) {
         Utils.verifyNotNull(player, "Tried to make a null player the owner of a pokemon.");
-
         if (pokemon.hasOwner()) {
             if (pokemon.getOwner().getUuid().equals(player.getUuid()))
                 throw new GeneralException("Tried to make player %s the owner of a pokemon they already own!", player.getName());
@@ -68,10 +77,12 @@ public class PokemonManager extends Manager {
             player.addPokemon(pokemon);
         else
             Testing.warn("Tried to give ownership of Pokemon: '%s' to player '%s', but they already have ownership of it!", pokemon.getName(), player.getName());
+
+        PokemonFileRepository.save(pokemon);
     }
 
     /**
-     * Removes a Pokémon from its owner.
+     * Removes a Pokémon from its owner and persists the change.
      *
      * @param pokemon The pokemon to remove.
      * @param player  The player to remove the Pokémon from.
@@ -81,23 +92,28 @@ public class PokemonManager extends Manager {
         updatePokemon(pokemon, p -> {
             player.removePokemon(pokemon);
             p.setOwner(null);
+            PokemonFileRepository.save(p);
         });
     }
 
     /**
-     * Updates a Pokémon's name to a new name.
+     * Updates a Pokémon's name to a new name and persists the change.
      *
      * @param pokemon The Pokémon whose name to update.
      * @param name The new name to set.
      */
     public static void setPokemonName(Pokemon pokemon, String name) {
         Utils.verify(isValidPokemonName(name), "Tried to set an invalid name: '%s' to %s.", name, pokemon.getName());
-        updatePokemon(pokemon, p -> p.setName(name));
+        updatePokemon(pokemon, p -> {
+            p.setName(name);
+            PokemonFileRepository.save(p);
+        });
     }
 
     private static void updatePokemon(Pokemon pokemon, Consumer<Pokemon> callback) {
         Utils.verifyNotNull(pokemon, "Cannot update a null pokemon.");
         callback.accept(pokemon);
+        POKEMON_BY_UUID.put(pokemon.getUuid(), pokemon);
     }
 
     /**
@@ -111,16 +127,20 @@ public class PokemonManager extends Manager {
     }
 
     /**
-     * Removes a pokemon by its id.
+     * Removes a pokemon by its id from the runtime cache and its persisted file.
      *
      * @param id The id to search for.
      */
     public static void removePokemon(UUID id) {
+        Pokemon p = POKEMON_BY_UUID.get(id);
+        if (p != null) {
+            PokemonFileRepository.remove(p);
+        }
         POKEMON_BY_UUID.remove(id);
     }
 
     /**
-     * Removes a pokemon.
+     * Removes a pokemon from the runtime cache and its persisted file.
      *
      * @param pokemon The pokemon to remove.
      */

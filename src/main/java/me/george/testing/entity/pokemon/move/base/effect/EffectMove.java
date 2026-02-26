@@ -11,7 +11,6 @@ import me.george.testing.entity.pokemon.move.base.TargetMove;
  * Created by George K. on 5/11/2024.
  */
 public abstract class EffectMove extends TargetMove implements AccuracyMove {
-
     private final Effect effect;
 
     protected EffectMove(MoveType type, Effect effect, Combatant caster, Combatant... targets) {

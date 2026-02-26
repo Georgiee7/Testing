@@ -1,5 +1,8 @@
 package me.george.testing.parties;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +26,12 @@ public class Party {
     @Setter(AccessLevel.PROTECTED)
     private Entity leader;
 
+    @JsonCreator
+    protected Party(@JsonProperty("members") Collection<Entity> members, @JsonProperty("leader") Entity leader) {
+        this.members = new CopyOnWriteArrayList<>(members == null ? List.of() : members);
+        this.leader = leader;
+    }
+
     protected Party(Collection<Entity> members, Collection<Combatant> combatants, Entity leader) {
         this.members = new CopyOnWriteArrayList<>(members == null ? List.of() : members);
         if (combatants == null)
@@ -37,6 +46,7 @@ public class Party {
      *
      * @return partyIsEmpty
      */
+    @JsonIgnore
     public boolean isEmpty() {
         return this.members.isEmpty();
     }
@@ -94,6 +104,7 @@ public class Party {
      *
      * @return memberCount
      */
+    @JsonIgnore
     public int getSize() {
         return getMembers().size();
     }
@@ -103,6 +114,7 @@ public class Party {
      *
      * @return combatantMembers
      */
+    @JsonIgnore
     public List<Entity> getCombatants() {
         return this.members.stream().filter(Combatant.class::isInstance).toList();
     }
@@ -112,6 +124,7 @@ public class Party {
      *
      * @return nonCombatantMembers
      */
+    @JsonIgnore
     public List<Entity> getNonCombatants() {
         return this.members.stream().filter(combatant -> !(combatant instanceof Combatant)).toList();
     }

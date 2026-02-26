@@ -1,10 +1,16 @@
 package me.george.testing.entity.pokemon.move.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 import lombok.Setter;
 import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.pokemon.Element;
 import me.george.testing.entity.pokemon.move.MoveType;
+import me.george.testing.entity.pokemon.move.base.effect.BuffMove;
+import me.george.testing.entity.pokemon.move.base.effect.DebuffMove;
+import me.george.testing.entity.pokemon.move.moves.MoveTackle;
 import me.george.testing.utils.Utils;
 
 /**
@@ -12,6 +18,12 @@ import me.george.testing.utils.Utils;
  * Created by George K. on 4/13/2024.
  */
 @Getter
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = MoveTackle.class, name = "tackle"),
+        @JsonSubTypes.Type(value = BuffMove.class, name = "buff_move"),
+        @JsonSubTypes.Type(value = DebuffMove.class, name = "debuff_move")
+})
 public abstract class Move {
 
     private final MoveType type;
@@ -21,6 +33,7 @@ public abstract class Move {
     @Setter
     private boolean undodgeable = false;
 
+    @JsonIgnore
     private final Combatant caster;
 
     @Setter
@@ -57,6 +70,7 @@ public abstract class Move {
      *
      * @return moveElement
      */
+    @JsonIgnore
     public Element getElement() {
         return this.type.getElement();
     }

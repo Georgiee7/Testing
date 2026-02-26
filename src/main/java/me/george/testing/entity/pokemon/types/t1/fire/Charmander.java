@@ -1,5 +1,7 @@
 package me.george.testing.entity.pokemon.types.t1.fire;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import me.george.testing.entity.combatant.stats.PermanentStats;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonType;
@@ -10,7 +12,8 @@ import me.george.testing.entity.pokemon.PokemonType;
  */
 public class Charmander extends Pokemon {
 
-    public Charmander(PermanentStats permanentStats) {
+    @JsonCreator
+    public Charmander(@JsonProperty("permanentStats") PermanentStats permanentStats) {
         super(PokemonType.CHARMANDER, permanentStats);
     }
 }

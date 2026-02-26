@@ -1,5 +1,6 @@
 package me.george.testing.entity.pokemon.move.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import me.george.testing.entity.combatant.Combatant;
@@ -13,7 +14,7 @@ import me.george.testing.utils.Utils;
 @Getter
 @Setter
 public abstract class TargetMove extends Move {
-
+    @JsonIgnore
     private Combatant[] targets;
 
     protected TargetMove(MoveType type, Combatant caster, Combatant... targets) {

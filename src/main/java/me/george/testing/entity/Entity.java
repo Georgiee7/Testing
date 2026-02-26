@@ -1,8 +1,15 @@
 package me.george.testing.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import me.george.testing.entity.player.Player;
+import me.george.testing.entity.pokemon.types.t1.fire.Charmander;
 import me.george.testing.parties.Party;
 
 import java.util.UUID;
@@ -12,8 +19,13 @@ import java.util.UUID;
  * Created by George K. on 4/16/2024.
  */
 @Getter
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Player.class, name = "player"),
+        @JsonSubTypes.Type(value = Charmander.class, name = "charmander")
+})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "uuid")
 public abstract class Entity {
-
     private final UUID uuid;
 
     @Setter
@@ -30,10 +42,15 @@ public abstract class Entity {
     @Setter(AccessLevel.PROTECTED)
     private int level = 1;
 
+    @JsonIgnore
     private Party party;
 
     protected Entity(String name) {
-        this.uuid = UUID.randomUUID();
+        this(UUID.randomUUID(), name);
+    }
+
+    protected Entity(UUID uuid, String name) {
+        this.uuid = uuid;
         this.name = name;
     }
 
@@ -42,6 +59,7 @@ public abstract class Entity {
      *
      * @return isInParty
      */
+    @JsonIgnore
     public boolean isInParty() {
         return this.party != null;
     }
@@ -82,6 +100,7 @@ public abstract class Entity {
      *
      * @return expRequirementArray
      */
+    @JsonIgnore
     protected abstract int[] getCachedExpRequirement();
 
     /**
@@ -106,6 +125,7 @@ public abstract class Entity {
      * @param level The level to use as a reference.
      * @return neededExp
      */
+    @JsonIgnore
     protected abstract int getNeededExp(int level);
 
     /**
@@ -121,6 +141,7 @@ public abstract class Entity {
      *
      * @return neededExp
      */
+    @JsonIgnore
     public int getNeededExp() {
         return getNeededExp(getLevel());
     }
@@ -130,6 +151,7 @@ public abstract class Entity {
      *
      * @return isMaxLevel
      */
+    @JsonIgnore
     protected abstract boolean isMaxLevel();
 
     /**

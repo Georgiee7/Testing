@@ -1,5 +1,8 @@
 package me.george.testing.entity.player;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,9 +10,12 @@ import me.george.testing.entity.Entity;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonType;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -19,17 +25,47 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Getter
 public class Player extends Entity {
+    // Runtime set of Pokemon instances (not serialized directly).
+    @JsonIgnore
     private final Set<Pokemon> pokemons;
 
     private final ConcurrentMap<Integer, PokemonType> pokedex;
 
+    @JsonIgnore
     @Setter(AccessLevel.PROTECTED)
     private Pokemon activePokemon;
 
-    protected Player(String name) {
-        super(name);
+    // Temporary holder for persisted pokemon UUIDs during deserialization.
+    @JsonProperty("pokemonUuids")
+    private List<UUID> persistedPokemonUuids = new ArrayList<>();
+
+    @JsonCreator
+    protected Player(@JsonProperty("uuid") UUID uuid, @JsonProperty("name") String name) {
+        super(uuid != null ? uuid : UUID.randomUUID(), name);
         this.pokemons = ConcurrentHashMap.newKeySet();
         this.pokedex = new ConcurrentHashMap<>();
+    }
+
+    protected Player(String name) {
+        this(null, name);
+    }
+
+    @JsonProperty("pokemonUuids")
+    public List<UUID> getPokemonUuidsForSerialization() {
+        List<UUID> uuids = new ArrayList<>();
+        for (Pokemon p : this.pokemons)
+            uuids.add(p.getUuid());
+
+        return uuids;
+    }
+
+    @JsonProperty("pokemonUuids")
+    public void setPokemonUuidsForDeserialization(List<UUID> uuids) {
+        this.persistedPokemonUuids = (uuids == null) ? new ArrayList<>() : new ArrayList<>(uuids);
+    }
+
+    public List<UUID> getPersistedPokemonUuids() {
+        return Collections.unmodifiableList(this.persistedPokemonUuids);
     }
 
     @Override

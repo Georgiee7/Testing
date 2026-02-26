@@ -1,5 +1,6 @@
 package me.george.testing.entity.pokemon;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.george.testing.manager.CombatManager;
@@ -34,8 +35,11 @@ public enum Element {
     POISON,
     FAIRY;
 
+    @JsonIgnore
     private final Set<Element> effectiveAgainst = new HashSet<>();
+    @JsonIgnore
     private final Set<Element> weakAgainst = new HashSet<>();
+    @JsonIgnore
     private final Set<Element> immuneFrom = new HashSet<>();
 
     static {
@@ -106,6 +110,7 @@ public enum Element {
      *
      * @return displayFriendlyName
      */
+    @JsonIgnore
     public String getDisplayName() {
         return Utils.capitalize(name());
     }
@@ -156,6 +161,7 @@ public enum Element {
      * @param other The element to compare to.
      * @return effectivenessMultiplier
      */
+    @JsonIgnore
     public float getEffectivenessMultiplier(Element other) {
         if (isEffectiveAgainst(other))
             return CombatManager.EFFECTIVE_DAMAGE_MULTIPLIER;

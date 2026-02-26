@@ -1,5 +1,6 @@
 package me.george.testing.entity.pokemon.move;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.pokemon.Element;
@@ -19,7 +20,9 @@ public enum MoveType {
 
     private final String name;
     private final Element element;
+    @JsonIgnore
     private final Function<Combatant, Move> maker;
+    @JsonIgnore
     private final BiFunction<Combatant, Combatant[], Move> targetMoveMaker;
     private final int baseDamage;
 

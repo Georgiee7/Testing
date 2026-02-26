@@ -1,7 +1,10 @@
 package me.george.testing.effect;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 import lombok.Setter;
+import me.george.testing.effect.effects.Paralysis;
 import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.utils.Utils;
 
@@ -12,6 +15,11 @@ import java.util.Collection;
  * Created by George K. on 5/11/2024.
  */
 @Getter
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DotEffect.class, name = "dot_effect"),
+        @JsonSubTypes.Type(value = Paralysis.class, name = "paralysis")
+})
 public abstract class Effect {
 
     private final EffectType effectType;

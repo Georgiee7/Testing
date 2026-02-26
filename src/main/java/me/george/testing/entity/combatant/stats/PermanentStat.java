@@ -1,5 +1,6 @@
 package me.george.testing.entity.combatant.stats;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,5 +18,6 @@ public enum PermanentStat {
     SP_DEF("Special Defense"),
     SPEED("Speed");
 
+    @JsonIgnore
     private final String displayName;
 }
