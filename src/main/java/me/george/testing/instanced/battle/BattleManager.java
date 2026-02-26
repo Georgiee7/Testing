@@ -1,6 +1,5 @@
 package me.george.testing.instanced.battle;
 
-import lombok.Getter;
 import me.george.testing.parties.Party;
 import me.george.testing.Testing;
 import me.george.testing.manager.Manager;
@@ -11,12 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Handles battle-related mechanics.
  * Created by George K. on 4/14/2024.
  */
-@Getter
 public class BattleManager extends Manager {
 
     private static final Map<UUID, Battle> CACHED_BATTLES = new HashMap<>();
@@ -25,7 +25,7 @@ public class BattleManager extends Manager {
     public void onStop() {
         int battles = CACHED_BATTLES.size();
         Testing.logInfo("Stopping %d battles...", battles);
-        CACHED_BATTLES.values().forEach(Battle::stop);
+        new ArrayList<>(CACHED_BATTLES.values()).forEach(Battle::stop);
         Testing.logInfo("Stopped %d battles.", battles);
     }
 
@@ -111,18 +111,18 @@ public class BattleManager extends Manager {
     }
 
     /**
-     * Gets all cached battles.
+     * Gets all cached battles as an unmodifiable snapshot.
      *
      * @return cachedBattles
      */
     public static Collection<Battle> getBattles() {
-        return CACHED_BATTLES.values();
+        return Collections.unmodifiableCollection(new ArrayList<>(CACHED_BATTLES.values()));
     }
 
     /**
      * Stops all cached battles.
      */
     public static void stopBattles() {
-        getBattles().stream().filter(battle -> !battle.isFinished()).forEach(BattleManager::stop);
+        new ArrayList<>(CACHED_BATTLES.values()).stream().filter(battle -> !battle.isFinished()).forEach(BattleManager::stop);
     }
 }

@@ -38,7 +38,7 @@ public class Battle implements InstancedScenario {
 
     protected Battle(Collection<Party> parties) {
         this.uuid = UUID.randomUUID();
-        this.parties = (List<Party>) parties;
+        this.parties = new ArrayList<>(parties);
         this.turnQueue = new LinkedList<>();
         this.pastTurns = new ArrayList<>();
         this.draw = false;

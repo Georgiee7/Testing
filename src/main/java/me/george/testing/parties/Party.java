@@ -9,25 +9,26 @@ import me.george.testing.entity.Entity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Represents a team/party that consists of players, which have their own teams of Pokémon.
  * Created by George K. on 4/14/2024.
  */
-@Getter
 public class Party {
 
     private final List<Entity> members;
 
+    @Getter
     @Setter(AccessLevel.PROTECTED)
     private Entity leader;
 
     protected Party(Collection<Entity> members, Collection<Combatant> combatants, Entity leader) {
-        this.members = (List<Entity>) members;
+        this.members = new ArrayList<>(members);
         if (combatants == null)
             combatants = new ArrayList<>();
 
-        this.members.addAll(combatants); // Wrapping the collection with an arraylist to prevent UnsupportedOperationException
+        this.members.addAll(combatants);
         this.leader = leader;
     }
 
@@ -113,5 +114,14 @@ public class Party {
      */
     public List<Entity> getNonCombatants() {
         return this.members.stream().filter(combatant -> !(combatant instanceof Combatant)).toList();
+    }
+
+    /**
+     * Returns an unmodifiable view of the party members to protect internal state.
+     *
+     * @return members
+     */
+    public List<Entity> getMembers() {
+        return Collections.unmodifiableList(this.members);
     }
 }

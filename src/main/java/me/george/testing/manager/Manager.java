@@ -1,6 +1,5 @@
 package me.george.testing.manager;
 
-import lombok.Getter;
 import me.george.testing.Testing;
 import me.george.testing.instanced.battle.BattleManager;
 import me.george.testing.parties.PartyManager;
@@ -10,6 +9,7 @@ import me.george.testing.utils.ReflectionUtil;
 import me.george.testing.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +20,6 @@ import java.util.Map;
  */
 public class Manager {
 
-    @Getter
     private static final List<Manager> managers = new ArrayList<>();
 
     private static final Map<Class<? extends Manager>, Manager> INSTANCE_MAP = new HashMap<>();
@@ -105,8 +104,17 @@ public class Manager {
     public static void addManager(Manager m) {
         Utils.verify(getInstance(m.getClass()) == null, "%s is already registered!", m.getName());
 
-        Manager.getManagers().add(m);
+        managers.add(m);
         INSTANCE_MAP.put(m.getClass(), m);
+    }
+
+    /**
+     * Returns an unmodifiable view of the registered managers.
+     *
+     * @return managers
+     */
+    public static List<Manager> getManagers() {
+        return Collections.unmodifiableList(managers);
     }
 
     /**
@@ -135,7 +143,7 @@ public class Manager {
      * @param message The message to log.
      * @param args The optional arguments to format the message with.
      */
-    public static <TManagerClass extends Manager> void log(Class<TManagerClass> managerClass, String message, Object args) {
+    public static <TManagerClass extends Manager> void log(Class<TManagerClass> managerClass, String message, Object... args) {
         Testing.logInfo(Utils.getSimpleName(managerClass) + " - " + message, args);
     }
 }

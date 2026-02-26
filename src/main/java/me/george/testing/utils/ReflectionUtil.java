@@ -37,7 +37,7 @@ public class ReflectionUtil {
             return emptyConstructor.newInstance(EMPTY_OBJECT_ARRAY);
         } catch (Throwable th) {
             Testing.warn("Could not construct %s, does it have a no-args constructor?", clazz.getSimpleName());
-            throw new RuntimeException(th);
+            throw new GeneralException(th, "Could not construct %s, does it have a no-args constructor?", clazz.getSimpleName());
         }
     }
 }

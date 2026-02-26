@@ -1,17 +1,17 @@
 package me.george.testing.data.storage.supported;
 
-import lombok.Getter;
 import me.george.testing.data.storage.DataStore;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
 
 /**
  * Represents an in-memory storage (cache) that is key-value separated.
  * Created by George K. on 4/13/2024.
  */
-@Getter
 public class InMemoryCache<K, V> implements DataStore<K, V> {
 
     private final Map<K, V> cache = new ConcurrentHashMap<>();
@@ -32,21 +32,21 @@ public class InMemoryCache<K, V> implements DataStore<K, V> {
     }
 
     /**
-     * Gets a collection of the keys.
+     * Gets a collection of the keys as an unmodifiable snapshot.
      *
      * @return keys
      */
     public Collection<K> getKeys() {
-        return this.cache.keySet();
+        return Collections.unmodifiableCollection(new ArrayList<>(this.cache.keySet()));
     }
 
     /**
-     * Gets a collection of the values.
+     * Gets a collection of the values as an unmodifiable snapshot.
      *
      * @return values
      */
     public Collection<V> getValues() {
-        return this.cache.values();
+        return Collections.unmodifiableCollection(new ArrayList<>(this.cache.values()));
     }
 
     /**
