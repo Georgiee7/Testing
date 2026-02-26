@@ -2,8 +2,8 @@ package me.george.testing.parties;
 
 import me.george.testing.Testing;
 import me.george.testing.data.storage.supported.InMemoryCache;
-import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.Entity;
+import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.player.Player;
 import me.george.testing.manager.Manager;
 import me.george.testing.utils.Utils;
@@ -47,7 +47,7 @@ public class PartyManager extends Manager {
      * Creates a new party of entities with a specified leader.
      *
      * @param entities The members of the party.
-     * @param leader  The leader of the party.
+     * @param leader   The leader of the party.
      * @return newParty
      */
     public static Party createParty(Collection<Entity> entities, Collection<Combatant> combatants, Entity leader) {

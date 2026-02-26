@@ -4,9 +4,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.george.testing.entity.combatant.Combatant;
-import me.george.testing.entity.player.Player;
 import me.george.testing.entity.combatant.stats.PermanentStat;
 import me.george.testing.entity.combatant.stats.PermanentStats;
+import me.george.testing.entity.player.Player;
 
 import java.util.Arrays;
 import java.util.Map;

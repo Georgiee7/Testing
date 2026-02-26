@@ -1,16 +1,16 @@
 package me.george.testing.instanced.battle;
 
-import me.george.testing.parties.Party;
 import me.george.testing.Testing;
 import me.george.testing.manager.Manager;
+import me.george.testing.parties.Party;
 import me.george.testing.utils.Utils;
 
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**

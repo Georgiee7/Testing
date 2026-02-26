@@ -2,8 +2,11 @@ package me.george.testing.entity.combatant.stats;
 
 import lombok.Getter;
 
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -12,7 +15,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @Getter
 public class PermanentStats {
-
     public static final int MIN_BASE_STAT = 5;
     public static final int MAX_BASE_STAT = 255;
 
@@ -26,9 +28,18 @@ public class PermanentStats {
     private final Map<PermanentStat, Integer> stats;
     private boolean initialized;
 
+    private StatsCalculator calculator = new DefaultStatsCalculator();
+
     public PermanentStats(Map<PermanentStat, Integer> stats) {
-        this.stats = stats;
-        this.initialized = this.stats != null && !this.stats.isEmpty();
+        if (stats instanceof EnumMap) {
+            this.stats = new EnumMap<>((EnumMap<PermanentStat, Integer>) stats);
+        } else if (stats != null) {
+            this.stats = new EnumMap<>(PermanentStat.class);
+            this.stats.putAll(stats);
+        } else {
+            this.stats = new EnumMap<>(PermanentStat.class);
+        }
+        this.initialized = !this.stats.isEmpty();
     }
 
     public PermanentStats() {
@@ -79,47 +90,88 @@ public class PermanentStats {
     }
 
     /**
-     * Calculates and re-assigns a combatant's stats according to Pokémon's base stat, EV and IV distribution rules.
-     * Original formula used.
+     * Calculate stats using the configured calculator.
      *
-     * @param totalEVs  Total EVs to account for.
+     * @param totalEVs  The total EVs to account for in the calculation.
      * @param baseStats Base stats to use in the formula.
      * @param level     The level to be used to calculate the bonus.
      */
     public void calculateStats(int totalEVs, Map<PermanentStat, Integer> baseStats, int level) {
-        // Distribute EVs among stats, ensuring they don't exceed the maximum allowed per stat.
-        int remainingEVs = Math.min(totalEVs, MAX_EV_AMOUNT_PER_POKEMON);
-        for (PermanentStat stat : PermanentStat.values()) {
-            int maxEVForStat = Math.min(remainingEVs, MAX_EV_AMOUNT_PER_STAT);
-            int evForStat = ThreadLocalRandom.current().nextInt(maxEVForStat + 1);
-
-            this.stats.put(stat, baseStats.getOrDefault(stat, MIN_BASE_STAT)); // Initialize to the stat, or otherwise the minimum base stat.
-            increaseStat(stat, evForStat); // Increase by random EVs.
-            remainingEVs -= evForStat;
-        }
-
-        // Generate IVs (Individual Values) for each stat.
-        for (PermanentStat stat : PermanentStat.values()) {
-            int iv = ThreadLocalRandom.current().nextInt(MIN_IV_ROLL, MAX_IV_ROLL + 1);
-            int baseStat = getStat(stat);
-            int ev = getStat(stat) - MIN_BASE_STAT;
-
-            setStat(stat, stat == PermanentStat.HP ? calculateHPStat(baseStat, iv, ev, level) : calculateOtherStat(baseStat, iv, ev, level));
-        }
-
-        this.initialized = true;
+        calculateStats(totalEVs, baseStats, level, ThreadLocalRandom.current());
     }
 
     /**
-     * Calculates and re-assigns a combatant's stats according to Pokémon's base stat, EV and IV distribution rules.
-     * Original formula used.
+     * Calculate stats using the configured calculator.
      *
-     * @param totalEVs  Total EVs to account for.
+     * @param totalEVs  The total EVs to account for in the calculation.
+     * @param baseStats Base stats to use in the formula.
+     * @param level     The level to be used to calculate the bonus.
+     * @param rng       The random number generator to use for IV rolls.
+     */
+    public void calculateStats(int totalEVs, Map<PermanentStat, Integer> baseStats, int level, Random rng) {
+        // Validate and clamp EVs before handing over to the calculator.
+        int clampedEVs = clampTotalEVs(totalEVs);
+        this.calculator.calculate(this, clampedEVs, baseStats, level, rng);
+    }
+
+    /**
+     * Convenience overload to match existing external usage that passes a Map of EVs per stat.
+     *
+     * @param totalEVs  Map of EVs per stat to account for.
      * @param baseStats Base stats to use in the formula.
      * @param level     The level to be used to calculate the bonus.
      */
     public void calculateStats(Map<PermanentStat, Integer> totalEVs, Map<PermanentStat, Integer> baseStats, int level) {
         calculateStats(totalEVs.values().stream().mapToInt(Integer::intValue).sum(), baseStats, level);
+    }
+
+    /**
+     * Returns an unmodifiable snapshot of the current stats map.
+     */
+    public Map<PermanentStat, Integer> asMap() {
+        return Collections.unmodifiableMap(new EnumMap<>((EnumMap<PermanentStat, Integer>) this.stats));
+    }
+
+    /**
+     * Replace stats from a provided map, clamping values into allowed range.
+     */
+    public void fromMap(Map<PermanentStat, Integer> map) {
+        this.stats.clear();
+        for (PermanentStat s : PermanentStat.values()) {
+            int v = map.getOrDefault(s, MIN_BASE_STAT);
+            this.stats.put(s, Math.max(MIN_BASE_STAT, Math.min(MAX_BASE_STAT, v)));
+        }
+
+        this.initialized = !this.stats.isEmpty();
+    }
+
+    /**
+     * Return a shallow copy of this PermanentStats.
+     */
+    public PermanentStats copy() {
+        return new PermanentStats(new EnumMap<>((EnumMap<PermanentStat, Integer>) this.stats));
+    }
+
+    /**
+     * Set the stats calculator to another implementation.
+     */
+    public void setCalculator(StatsCalculator calc) {
+        this.calculator = calc != null ? calc : new DefaultStatsCalculator();
+    }
+
+    void statsPut(PermanentStat stat, int value) {
+        this.stats.put(stat, value);
+    }
+
+    void setInitialized(boolean value) {
+        this.initialized = value;
+    }
+
+    private int clampTotalEVs(int evs) {
+        if (evs < MIN_EV_AMOUNT)
+            return 0;
+
+        return Math.min(evs, MAX_EV_AMOUNT_PER_POKEMON);
     }
 
     private static int calculateHPStat(int baseStat, int iv, int ev, int level) {

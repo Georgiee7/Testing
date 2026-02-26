@@ -4,9 +4,9 @@ import me.george.testing.data.storage.DataStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Collections;
 
 /**
  * Represents an in-memory storage (cache) that is key-value separated.

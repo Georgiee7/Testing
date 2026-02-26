@@ -1,18 +1,18 @@
 package me.george.testing.manager;
 
 import me.george.testing.Testing;
-import me.george.testing.instanced.battle.BattleManager;
-import me.george.testing.parties.PartyManager;
 import me.george.testing.entity.player.PlayerManager;
 import me.george.testing.entity.pokemon.PokemonManager;
+import me.george.testing.instanced.battle.BattleManager;
+import me.george.testing.parties.PartyManager;
 import me.george.testing.utils.ReflectionUtil;
 import me.george.testing.utils.Utils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Represents a base manager responsible for the handling of a system.
@@ -138,8 +138,8 @@ public class Manager {
      * Logs a formatted message as a specific manager.
      *
      * @param managerClass The class of the manager to use as a logger source.
-     * @param message The message to log.
-     * @param args The optional arguments to format the message with.
+     * @param message      The message to log.
+     * @param args         The optional arguments to format the message with.
      */
     public static <TManagerClass extends Manager> void log(Class<TManagerClass> managerClass, String message, Object... args) {
         Testing.logInfo(Utils.getSimpleName(managerClass) + " - " + message, args);

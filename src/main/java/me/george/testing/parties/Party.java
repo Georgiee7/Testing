@@ -3,13 +3,13 @@ package me.george.testing.parties;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.Entity;
+import me.george.testing.entity.combatant.Combatant;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
