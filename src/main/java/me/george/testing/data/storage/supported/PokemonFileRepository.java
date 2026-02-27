@@ -6,15 +6,26 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 /**
- * Simple file-backed repository for Pokemon objects using JSON.
+ * Simple file-backed repository for {@link Pokemon} objects using JSON.
+ * <p>
+ * The storage directory defaults to {@code data/json/pokemons} but can be overridden
+ * via the {@code data.dir} system property — set this in tests to a temp directory
+ * so test data never touches the real application data.
+ * </p>
  * Created by George K. on 2/26/2026.
  */
 public final class PokemonFileRepository extends AbstractFileRepository<Pokemon> {
-    private static final Path POKEMON_DIR = Path.of("data", "json", "pokemons");
+    public static final String DATA_DIR_PROPERTY = "data.dir";
+    private static final String DEFAULT_DATA_DIR = "data";
+
     private static final PokemonFileRepository INSTANCE = new PokemonFileRepository();
 
     private PokemonFileRepository() {
-        super(POKEMON_DIR, Pokemon.class);
+        super(resolveDir(), Pokemon.class);
+    }
+
+    private static Path resolveDir() {
+        return Path.of(System.getProperty(DATA_DIR_PROPERTY, DEFAULT_DATA_DIR), "json", "pokemons");
     }
 
     public static PokemonFileRepository getInstance() {
@@ -25,12 +36,14 @@ public final class PokemonFileRepository extends AbstractFileRepository<Pokemon>
      * Returns the repository directory path used to store pokemon JSON files.
      */
     public static Path getDir() {
-        return POKEMON_DIR;
+        return getInstance().dir;
     }
 
     @Override
     protected boolean isValid(Pokemon pokemon) {
-        return pokemon != null && pokemon.getUuid() != null && pokemon.getName() != null && !pokemon.getName().isEmpty() && pokemon.getType() != null;
+        return pokemon != null && pokemon.getUuid() != null
+                && pokemon.getName() != null && !pokemon.getName().isEmpty()
+                && pokemon.getType() != null;
     }
 
     /**

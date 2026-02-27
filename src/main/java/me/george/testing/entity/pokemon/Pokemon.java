@@ -2,6 +2,8 @@ package me.george.testing.entity.pokemon;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +11,7 @@ import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.combatant.stats.PermanentStat;
 import me.george.testing.entity.combatant.stats.PermanentStats;
 import me.george.testing.entity.player.Player;
+import me.george.testing.entity.pokemon.types.t1.fire.Charmander;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -17,9 +20,19 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a base Pokémon of a specific type.
+ * <p>
+ * Polymorphic deserialization is handled here (not on {@link me.george.testing.entity.Entity})
+ * because only Pokemon needs it — Player is always deserialized to its concrete type directly.
+ * To add a new Pokémon species: create a subclass with a full-args {@code @JsonCreator},
+ * register it in the {@code @JsonSubTypes} list below, and add a maker to {@link PokemonType}.
+ * </p>
  * Created by George K. on 4/12/2024.
  */
 @Getter
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Charmander.class, name = "charmander")
+})
 public abstract class Pokemon extends Combatant {
     private final PokemonType type;
 

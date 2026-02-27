@@ -18,66 +18,61 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests for PersistenceManager and its interaction with repositories.
+ * Tests for {@link PersistenceManager} — verifies that flushNow() actually writes
+ * in-memory state to disk.
+ * I/O goes to {@code target/test-data} (via the {@code data.dir} system property).
  * Created by George K. on 2/26/2026.
  */
 public class PersistenceManagerTest {
-    private final Path playersDir = PlayerFileRepository.getDir();
-    private final Path pokemonsDir = PokemonFileRepository.getDir();
 
     @BeforeEach
     public void setup() throws Exception {
-        // Clear caches before each test.
         PlayerManager.clearCache();
         PokemonManager.clearCache();
-        deleteDirectory(this.playersDir);
-        deleteDirectory(this.pokemonsDir);
+        wipe(PlayerFileRepository.getDir());
+        wipe(PokemonFileRepository.getDir());
     }
 
     @AfterEach
     public void cleanup() throws Exception {
-        deleteDirectory(this.playersDir);
-        deleteDirectory(this.pokemonsDir);
-
-        // Clear runtime caches.
+        wipe(PlayerFileRepository.getDir());
+        wipe(PokemonFileRepository.getDir());
         PlayerManager.clearCache();
         PokemonManager.clearCache();
     }
 
-    private void deleteDirectory(Path dir) throws Exception {
-        if (Files.exists(dir)) {
-            try (var w = Files.walk(dir)) {
-                w.sorted(Comparator.reverseOrder()).forEach(p -> {
-                    try { Files.deleteIfExists(p); } catch (Exception ignored) {}
-                });
-            }
+    private void wipe(Path dir) throws Exception {
+        if (!Files.exists(dir))
+            return;
+
+        try (var w = Files.walk(dir)) {
+            w.sorted(Comparator.reverseOrder()).forEach(p -> {
+                try { Files.deleteIfExists(p); } catch (Exception ignored) {}
+            });
         }
     }
 
     @Test
     public void testFlushNowPersistsData() {
-        Player player = PlayerManager.create("pm_test_player");
+        Player player = PlayerManager.create("pm_player");
         Pokemon pokemon = PokemonManager.create(PokemonType.CHARMANDER, null);
         PokemonManager.setPokemonOwner(pokemon, player);
 
-        // Remove files if present to ensure flush truly writes them.
+        // Remove any files already written by create/save so flushNow is the thing being tested.
         PlayerFileRepository.remove(player);
         PokemonFileRepository.remove(pokemon);
 
-        // Ensure files are absent.
-        Path playerFile = this.playersDir.resolve(player.getUuid().toString() + ".json");
-        Path pokemonFile = this.pokemonsDir.resolve(pokemon.getUuid().toString() + ".json");
-        assertFalse(Files.exists(playerFile));
-        assertFalse(Files.exists(pokemonFile));
+        Path playerFile = PlayerFileRepository.getDir().resolve(player.getUuid() + ".json");
+        Path pokemonFile = PokemonFileRepository.getDir().resolve(pokemon.getUuid() + ".json");
+        assertFalse(Files.exists(playerFile), "Player file should not exist before flush");
+        assertFalse(Files.exists(pokemonFile), "Pokemon file should not exist before flush");
 
-        // Trigger immediate flush.
         PersistenceManager.flushNow();
 
-        // files should now exist.
-        assertTrue(Files.exists(playerFile));
-        assertTrue(Files.exists(pokemonFile));
+        assertTrue(Files.exists(playerFile), "Player file should exist after flush");
+        assertTrue(Files.exists(pokemonFile), "Pokemon file should exist after flush");
 
-        // And loading should return the objects.
+        // Loading should return both objects.
         Collection<Player> players = PlayerFileRepository.loadAll();
         assertTrue(players.stream().anyMatch(p -> p.getUuid().equals(player.getUuid())));
 

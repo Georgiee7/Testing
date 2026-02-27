@@ -18,58 +18,56 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests for the file-backed repositories to ensure they can save, load, and handle corrupt files correctly.
+ * Tests for the file-backed repositories: save/load round-trip and corrupt-file quarantine.
+ * All I/O goes to {@code target/test-data} (set via the {@code data.dir} system property in
+ * pom.xml) so it never touches the real {@code data/} directory.
  * Created by George K. on 2/26/2026.
  */
 public class FileRepositoryTest {
-    private final Path playersDir = PlayerFileRepository.getDir();
-    private final Path pokemonsDir = PokemonFileRepository.getDir();
 
     @BeforeEach
     public void setup() throws Exception {
-        // Ensure clean state before each test.
         PlayerManager.clearCache();
         PokemonManager.clearCache();
-        deleteDirectory(this.playersDir);
-        deleteDirectory(this.pokemonsDir);
+        wipe(PlayerFileRepository.getDir());
+        wipe(PokemonFileRepository.getDir());
     }
 
     @AfterEach
     public void cleanup() throws Exception {
-        // Clear runtime caches first.
-        PlayerManager.getPlayers().forEach(p -> PlayerManager.removePlayer(p.getUuid()));
-        PokemonManager.getPokemons().forEach(PokemonManager::removePokemon);
-
-        // Recursively delete test data directories if they exist.
-        deleteDirectory(this.playersDir);
-        deleteDirectory(this.pokemonsDir);
+        PlayerManager.clearCache();
+        PokemonManager.clearCache();
+        wipe(PlayerFileRepository.getDir());
+        wipe(PokemonFileRepository.getDir());
     }
 
-    private void deleteDirectory(Path dir) throws Exception {
-        if (Files.exists(dir)) {
-            try (var walker = Files.walk(dir)) {
-                walker.sorted(Comparator.reverseOrder())
-                        .forEach(p -> {
-                            try {
-                                Files.deleteIfExists(p);
-                            } catch (Exception ignored) {
-                            }
-                        });
-            }
+    private void wipe(Path dir) throws Exception {
+        if (!Files.exists(dir)) return;
+        try (var w = Files.walk(dir)) {
+            w.sorted(Comparator.reverseOrder()).forEach(p -> {
+                try { Files.deleteIfExists(p); } catch (Exception ignored) {}
+            });
         }
     }
 
     @Test
     public void testPlayerSaveLoad() {
-        Player player = PlayerManager.create("testfileplayer");
+        Player player = PlayerManager.create("saveloaduser");
         PlayerFileRepository.save(player);
 
-        Collection<Player> players = PlayerFileRepository.loadAll();
-        assertTrue(players.stream().anyMatch(p -> p.getUuid().equals(player.getUuid())));
+        Collection<Player> loaded = PlayerFileRepository.loadAll();
+        assertTrue(loaded.stream().anyMatch(p -> p.getUuid().equals(player.getUuid())));
+    }
+
+    @Test
+    public void testPlayerRemove() {
+        Player player = PlayerManager.create("removeuser");
+        PlayerFileRepository.save(player);
 
         PlayerFileRepository.remove(player);
-        Collection<Player> playersAfterRemove = PlayerFileRepository.loadAll();
-        assertFalse(playersAfterRemove.stream().anyMatch(p -> p.getUuid().equals(player.getUuid())));
+
+        Collection<Player> loaded = PlayerFileRepository.loadAll();
+        assertFalse(loaded.stream().anyMatch(p -> p.getUuid().equals(player.getUuid())));
     }
 
     @Test
@@ -77,28 +75,48 @@ public class FileRepositoryTest {
         Pokemon pokemon = PokemonManager.create(PokemonType.CHARMANDER, null);
         PokemonFileRepository.save(pokemon);
 
-        Collection<Pokemon> pokemons = PokemonFileRepository.loadAll();
-        assertTrue(pokemons.stream().anyMatch(p -> p.getUuid().equals(pokemon.getUuid())));
-
-        PokemonFileRepository.remove(pokemon);
-        Collection<Pokemon> pokemonsAfterRemove = PokemonFileRepository.loadAll();
-        assertFalse(pokemonsAfterRemove.stream().anyMatch(p -> p.getUuid().equals(pokemon.getUuid())));
+        Collection<Pokemon> loaded = PokemonFileRepository.loadAll();
+        assertTrue(loaded.stream().anyMatch(p -> p.getUuid().equals(pokemon.getUuid())));
     }
 
     @Test
-    public void testCorruptFileMoved() throws Exception {
-        // Create players dir.
-        Files.createDirectories(this.playersDir);
-        Path corruptFile = this.playersDir.resolve("bad.json");
-        Files.writeString(corruptFile, "THIS IS NOT JSON");
+    public void testPokemonRemove() {
+        Pokemon pokemon = PokemonManager.create(PokemonType.CHARMANDER, null);
+        PokemonFileRepository.save(pokemon);
+
+        PokemonFileRepository.remove(pokemon);
+
+        Collection<Pokemon> loaded = PokemonFileRepository.loadAll();
+        assertFalse(loaded.stream().anyMatch(p -> p.getUuid().equals(pokemon.getUuid())));
+    }
+
+    @Test
+    public void testCorruptFileIsQuarantined() throws Exception {
+        Files.createDirectories(PlayerFileRepository.getDir());
+        Files.writeString(PlayerFileRepository.getDir().resolve("bad.json"), "THIS IS NOT JSON");
 
         Collection<Player> players = PlayerFileRepository.loadAll();
-        assertTrue(players.isEmpty());
 
-        Path corruptDir = this.playersDir.resolve("corrupt");
-        assertTrue(Files.exists(corruptDir), "Corrupt directory should have been created");
-        try (var stream = Files.list(corruptDir)) {
-            assertTrue(stream.findAny().isPresent(), "Corrupt file should have been moved to corrupt directory");
+        assertTrue(players.isEmpty(), "Corrupt file should not produce a player");
+
+        Path quarantine = PlayerFileRepository.getDir().resolve("corrupt");
+        assertTrue(Files.exists(quarantine), "Quarantine directory should be created");
+        try (var stream = Files.list(quarantine)) {
+            assertTrue(stream.findAny().isPresent(), "Corrupt file should be moved to quarantine");
         }
+    }
+
+    @Test
+    public void testInvalidPlayerFileIsQuarantined() throws Exception {
+        // Valid JSON but missing required fields → fails isValid().
+        Files.createDirectories(PlayerFileRepository.getDir());
+        Files.writeString(PlayerFileRepository.getDir().resolve("invalid.json"),
+                "{\"uuid\":null,\"name\":null}");
+
+        Collection<Player> players = PlayerFileRepository.loadAll();
+        assertTrue(players.isEmpty(), "Invalid player (null uuid/name) should not be returned");
+
+        Path quarantine = PlayerFileRepository.getDir().resolve("corrupt");
+        assertTrue(Files.exists(quarantine));
     }
 }

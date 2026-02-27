@@ -6,15 +6,26 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 /**
- * Simple file-backed repository for Player objects using JSON.
+ * Simple file-backed repository for {@link Player} objects using JSON.
+ * <p>
+ * The storage directory defaults to {@code data/json/players} but can be overridden
+ * via the {@code data.dir} system property — set this in tests to a temp directory
+ * so test data never touches the real application data.
+ * </p>
  * Created by George K. on 2/26/2026.
  */
 public final class PlayerFileRepository extends AbstractFileRepository<Player> {
-    private static final Path PLAYERS_DIR = Path.of("data", "json", "players");
+    public static final String DATA_DIR_PROPERTY = "data.dir";
+    private static final String DEFAULT_DATA_DIR = "data";
+
     private static final PlayerFileRepository INSTANCE = new PlayerFileRepository();
 
     private PlayerFileRepository() {
-        super(PLAYERS_DIR, Player.class);
+        super(resolveDir(), Player.class);
+    }
+
+    private static Path resolveDir() {
+        return Path.of(System.getProperty(DATA_DIR_PROPERTY, DEFAULT_DATA_DIR), "json", "players");
     }
 
     public static PlayerFileRepository getInstance() {
@@ -25,12 +36,13 @@ public final class PlayerFileRepository extends AbstractFileRepository<Player> {
      * Returns the repository directory path used to store player JSON files.
      */
     public static Path getDir() {
-        return PLAYERS_DIR;
+        return getInstance().dir;
     }
 
     @Override
     protected boolean isValid(Player player) {
-        return player != null && player.getUuid() != null && player.getName() != null && !player.getName().isEmpty();
+        return player != null && player.getUuid() != null
+                && player.getName() != null && !player.getName().isEmpty();
     }
 
     /**

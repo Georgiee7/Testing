@@ -18,26 +18,24 @@ import java.util.Comparator;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests that the linking process correctly restores relationships between entities after loading from disk.
+ * Tests that {@link Manager#relinkPersistentEntities()} correctly restores owner relationships
+ * between Pokemon and Players after a simulated restart (clear → load from disk → relink).
  * Created by George K. on 2/26/2026.
  */
 public class ManagerLinkingTest {
-    private final Path playersDir = PlayerFileRepository.getDir();
-    private final Path pokemonsDir = PokemonFileRepository.getDir();
 
     @BeforeEach
     public void setup() throws Exception {
-        // Ensure clean state before each test.
         clearCaches();
-        deleteDirectory(this.playersDir);
-        deleteDirectory(this.pokemonsDir);
+        wipe(PlayerFileRepository.getDir());
+        wipe(PokemonFileRepository.getDir());
     }
 
     @AfterEach
     public void cleanup() throws Exception {
         clearCaches();
-        deleteDirectory(this.playersDir);
-        deleteDirectory(this.pokemonsDir);
+        wipe(PlayerFileRepository.getDir());
+        wipe(PokemonFileRepository.getDir());
     }
 
     private void clearCaches() {
@@ -45,50 +43,61 @@ public class ManagerLinkingTest {
         PokemonManager.clearCache();
     }
 
-    private void deleteDirectory(Path dir) throws Exception {
-        if (Files.exists(dir)) {
-            try (var w = Files.walk(dir)) {
-                w.sorted(Comparator.reverseOrder()).forEach(p -> {
-                    try { Files.deleteIfExists(p); } catch (Exception ignored) {}
-                });
-            }
+    private void wipe(Path dir) throws Exception {
+        if (!Files.exists(dir)) return;
+        try (var w = Files.walk(dir)) {
+            w.sorted(Comparator.reverseOrder()).forEach(p -> {
+                try { Files.deleteIfExists(p); } catch (Exception ignored) {}
+            });
         }
     }
 
     @Test
     public void testLinkingRestoresOwners() {
-        // Create a player and pokemon and persist them.
-        Player player = PlayerManager.create("link_test_player");
+        Player player = PlayerManager.create("link_player");
         Pokemon pokemon = PokemonManager.create(PokemonType.CHARMANDER, null);
-
-        // Set ownership and persist both.
         PokemonManager.setPokemonOwner(pokemon, player);
+
+        // Persist both.
         PlayerFileRepository.save(player);
         PokemonFileRepository.save(pokemon);
 
-        // Clear in-memory caches to simulate a fresh start.
+        // Simulate a fresh start: clear caches WITHOUT deleting files.
         clearCaches();
 
-        // Load from disk via managers' onStart hooks.
-        PlayerManager pm = new PlayerManager();
-        PokemonManager pokm = new PokemonManager();
-        pm.onStart();
-        pokm.onStart();
-
-        // Perform linking.
+        // Re-load via onStart hooks (mirrors what Manager.registerManagers does).
+        new PlayerManager().onStart();
+        new PokemonManager().onStart();
         Manager.relinkPersistentEntities();
 
-        // Now the managers' caches should contain the linked objects.
         Player loadedPlayer = PlayerManager.getPlayers().stream()
-                .filter(p -> p.getName().equals("link_test_player")).findAny().orElse(null);
+                .filter(p -> p.getUuid().equals(player.getUuid())).findFirst().orElse(null);
         assertNotNull(loadedPlayer, "Player should have been loaded from disk");
 
         Pokemon loadedPokemon = PokemonManager.getPokemons().stream()
-                .filter(p -> p.getType() == PokemonType.CHARMANDER).findAny().orElse(null);
+                .filter(p -> p.getUuid().equals(pokemon.getUuid())).findFirst().orElse(null);
         assertNotNull(loadedPokemon, "Pokemon should have been loaded from disk");
 
-        // The owner should be set and player should have the pokemon in their runtime set.
-        assertEquals(loadedPlayer.getUuid(), loadedPokemon.getOwnerUuid());
-        assertTrue(loadedPlayer.hasPokemon(loadedPokemon));
+        assertEquals(loadedPlayer.getUuid(), loadedPokemon.getOwnerUuid(),
+                "Pokemon's ownerUuid should match the player's UUID");
+        assertTrue(loadedPlayer.hasPokemon(loadedPokemon),
+                "Player should have the pokemon in their runtime set after relinking");
+    }
+
+    @Test
+    public void testLinkingWithNoOwnerIsNoop() {
+        // A pokemon with no owner should load fine and have null ownerUuid.
+        Pokemon pokemon = PokemonManager.create(PokemonType.CHARMANDER, null);
+        PokemonFileRepository.save(pokemon);
+
+        clearCaches();
+        new PokemonManager().onStart();
+        Manager.relinkPersistentEntities();
+
+        Pokemon loaded = PokemonManager.getPokemons().stream()
+                .filter(p -> p.getUuid().equals(pokemon.getUuid())).findFirst().orElse(null);
+        assertNotNull(loaded);
+        assertNull(loaded.getOwnerUuid(), "Unowned pokemon should have null ownerUuid");
+        assertNull(loaded.getOwner(), "Unowned pokemon should have null owner reference");
     }
 }
