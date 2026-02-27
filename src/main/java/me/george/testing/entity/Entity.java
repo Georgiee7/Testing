@@ -55,6 +55,19 @@ public abstract class Entity {
     }
 
     /**
+     * Full-args constructor used for Jackson deserialization via subclass @JsonCreator.
+     * Restores all persisted fields without triggering side-effects.
+     */
+    protected Entity(UUID uuid, String name, boolean alive, int health, int exp, int level) {
+        this.uuid = uuid;
+        this.name = name;
+        this.alive = alive;
+        this.health = health;
+        this.exp = exp;
+        this.level = level;
+    }
+
+    /**
      * Whether the entity belongs to a party or not.
      *
      * @return isInParty

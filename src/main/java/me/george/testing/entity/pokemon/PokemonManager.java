@@ -158,6 +158,14 @@ public class PokemonManager extends Manager {
     }
 
     /**
+     * Clears the in-memory Pokemon cache without deleting persisted files.
+     * Intended for test isolation — use {@link #removePokemon(UUID)} to fully delete.
+     */
+    public static void clearCache() {
+        POKEMON_BY_UUID.clear();
+    }
+
+    /**
      * Checks whether a string is a valid Pokémon name.
      *
      * @param string The string to check.

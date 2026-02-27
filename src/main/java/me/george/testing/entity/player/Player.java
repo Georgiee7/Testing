@@ -42,14 +42,23 @@ public class Player extends Entity {
     private List<UUID> persistedPokemonUuids = new ArrayList<>();
 
     @JsonCreator
-    protected Player(@JsonProperty("uuid") UUID uuid, @JsonProperty("name") String name) {
-        super(uuid != null ? uuid : UUID.randomUUID(), name);
+    protected Player(
+            @JsonProperty("uuid") UUID uuid,
+            @JsonProperty("name") String name,
+            @JsonProperty("alive") boolean alive,
+            @JsonProperty("health") int health,
+            @JsonProperty("exp") int exp,
+            @JsonProperty("level") int level) {
+        super(uuid != null ? uuid : UUID.randomUUID(), name,
+              alive, health, exp, level > 0 ? level : 1);
         this.pokemons = ConcurrentHashMap.newKeySet();
         this.pokedex = new ConcurrentHashMap<>();
     }
 
     protected Player(String name) {
-        this(null, name);
+        super(UUID.randomUUID(), name);
+        this.pokemons = ConcurrentHashMap.newKeySet();
+        this.pokedex = new ConcurrentHashMap<>();
     }
 
     /**
@@ -196,6 +205,7 @@ public class Player extends Entity {
      *
      * @return pokemons
      */
+    @JsonIgnore
     public Set<Pokemon> getPokemons() {
         return Collections.unmodifiableSet(this.pokemons);
     }
@@ -205,6 +215,7 @@ public class Player extends Entity {
      *
      * @return pokedex
      */
+    @JsonIgnore
     public Map<Integer, PokemonType> getPokedex() {
         return Collections.unmodifiableMap(this.pokedex);
     }

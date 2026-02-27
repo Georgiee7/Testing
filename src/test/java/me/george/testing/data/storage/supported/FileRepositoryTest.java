@@ -6,6 +6,7 @@ import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.entity.pokemon.PokemonType;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -17,30 +18,36 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests for the file-based repositories to ensure they can save, load, and handle corrupt files correctly.
+ * Tests for the file-backed repositories to ensure they can save, load, and handle corrupt files correctly.
  * Created by George K. on 2/26/2026.
  */
 public class FileRepositoryTest {
     private final Path playersDir = PlayerFileRepository.getDir();
     private final Path pokemonsDir = PokemonFileRepository.getDir();
 
+    @BeforeEach
+    public void setup() throws Exception {
+        // Ensure clean state before each test.
+        PlayerManager.clearCache();
+        PokemonManager.clearCache();
+        deleteDirectory(this.playersDir);
+        deleteDirectory(this.pokemonsDir);
+    }
+
     @AfterEach
     public void cleanup() throws Exception {
-        // Recursively delete test data directories if they exist.
-        if (Files.exists(this.playersDir)) {
-            try (var walker = Files.walk(this.playersDir)) {
-                walker.sorted(Comparator.reverseOrder())
-                        .forEach(p -> {
-                            try {
-                                Files.deleteIfExists(p);
-                            } catch (Exception ignored) {
-                            }
-                        });
-            }
-        }
+        // Clear runtime caches first.
+        PlayerManager.getPlayers().forEach(p -> PlayerManager.removePlayer(p.getUuid()));
+        PokemonManager.getPokemons().forEach(PokemonManager::removePokemon);
 
-        if (Files.exists(this.pokemonsDir)) {
-            try (var walker = Files.walk(this.pokemonsDir)) {
+        // Recursively delete test data directories if they exist.
+        deleteDirectory(this.playersDir);
+        deleteDirectory(this.pokemonsDir);
+    }
+
+    private void deleteDirectory(Path dir) throws Exception {
+        if (Files.exists(dir)) {
+            try (var walker = Files.walk(dir)) {
                 walker.sorted(Comparator.reverseOrder())
                         .forEach(p -> {
                             try {
@@ -83,15 +90,15 @@ public class FileRepositoryTest {
         // Create players dir.
         Files.createDirectories(this.playersDir);
         Path corruptFile = this.playersDir.resolve("bad.json");
-        Files.writeString(corruptFile, "{ this is : not valid json }");
+        Files.writeString(corruptFile, "THIS IS NOT JSON");
 
         Collection<Player> players = PlayerFileRepository.loadAll();
         assertTrue(players.isEmpty());
 
         Path corruptDir = this.playersDir.resolve("corrupt");
-        assertTrue(Files.exists(corruptDir));
+        assertTrue(Files.exists(corruptDir), "Corrupt directory should have been created");
         try (var stream = Files.list(corruptDir)) {
-            assertTrue(stream.findAny().isPresent());
+            assertTrue(stream.findAny().isPresent(), "Corrupt file should have been moved to corrupt directory");
         }
     }
 }

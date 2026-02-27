@@ -6,6 +6,7 @@ import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.entity.pokemon.PokemonType;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -24,37 +25,33 @@ public class PersistenceManagerTest {
     private final Path playersDir = PlayerFileRepository.getDir();
     private final Path pokemonsDir = PokemonFileRepository.getDir();
 
+    @BeforeEach
+    public void setup() throws Exception {
+        // Clear caches before each test.
+        PlayerManager.clearCache();
+        PokemonManager.clearCache();
+        deleteDirectory(this.playersDir);
+        deleteDirectory(this.pokemonsDir);
+    }
+
     @AfterEach
     public void cleanup() throws Exception {
-        if (Files.exists(this.playersDir)) {
-            try (var w = Files.walk(this.playersDir)) {
-                w.sorted(Comparator.reverseOrder()).forEach(p -> {
-                            try {
-                                Files.deleteIfExists(p);
-                            } catch (Exception ignored) {
-                            }
-                        }
-                );
-            }
-        }
+        deleteDirectory(this.playersDir);
+        deleteDirectory(this.pokemonsDir);
 
-        if (Files.exists(this.pokemonsDir)) {
-            try (var w = Files.walk(this.pokemonsDir)) {
+        // Clear runtime caches.
+        PlayerManager.clearCache();
+        PokemonManager.clearCache();
+    }
+
+    private void deleteDirectory(Path dir) throws Exception {
+        if (Files.exists(dir)) {
+            try (var w = Files.walk(dir)) {
                 w.sorted(Comparator.reverseOrder()).forEach(p -> {
-                    try {
-                        Files.deleteIfExists(p);
-                    } catch (Exception ignored) {
-                    }
+                    try { Files.deleteIfExists(p); } catch (Exception ignored) {}
                 });
             }
         }
-
-        // Clear runtime caches.
-        for (Player p : PlayerManager.getPlayers())
-            PlayerManager.removePlayer(p.getUuid());
-
-        for (Pokemon pk : PokemonManager.getPokemons())
-            PokemonManager.removePokemon(pk.getUuid());
     }
 
     @Test

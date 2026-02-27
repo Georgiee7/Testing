@@ -127,6 +127,14 @@ public class PlayerManager extends Manager {
     }
 
     /**
+     * Clears the in-memory player cache without deleting persisted files.
+     * Intended for test isolation — use {@link #deleteData(Player)} to fully delete.
+     */
+    public static void clearCache() {
+        PLAYERS_BY_UUID.clear();
+    }
+
+    /**
      * Gets a player by their id, or null if one does not exist.
      *
      * @param id The id to search for.

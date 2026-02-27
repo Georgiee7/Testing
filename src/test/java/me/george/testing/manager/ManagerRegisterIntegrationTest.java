@@ -8,6 +8,7 @@ import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.entity.pokemon.PokemonType;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -24,56 +25,62 @@ public class ManagerRegisterIntegrationTest {
     private final Path playersDir = PlayerFileRepository.getDir();
     private final Path pokemonsDir = PokemonFileRepository.getDir();
 
+    @BeforeEach
+    public void setup() throws Exception {
+        // Ensure clean state: clear manager registry and in-memory caches.
+        Manager.clearManagers();
+        clearCaches();
+        deleteDirectory(this.playersDir);
+        deleteDirectory(this.pokemonsDir);
+    }
+
     @AfterEach
     public void cleanup() throws Exception {
-        if (Files.exists(this.playersDir)) {
-            try (var w = Files.walk(this.playersDir)) {
+        Manager.clearManagers();
+        clearCaches();
+        deleteDirectory(this.playersDir);
+        deleteDirectory(this.pokemonsDir);
+    }
+
+    private void clearCaches() {
+        PlayerManager.clearCache();
+        PokemonManager.clearCache();
+    }
+
+    private void deleteDirectory(Path dir) throws Exception {
+        if (Files.exists(dir)) {
+            try (var w = Files.walk(dir)) {
                 w.sorted(Comparator.reverseOrder()).forEach(p -> {
-                    try {
-                        Files.deleteIfExists(p);
-                    } catch (Exception ignored) {
-                    }
+                    try { Files.deleteIfExists(p); } catch (Exception ignored) {}
                 });
             }
         }
-
-        if (Files.exists(this.pokemonsDir)) {
-            try (var w = Files.walk(this.pokemonsDir)) {
-                w.sorted(Comparator.reverseOrder()).forEach(p -> {
-                    try {
-                        Files.deleteIfExists(p);
-                    } catch (Exception ignored) {}
-                });
-            }
-        }
-
-        // clear managers.
-        PlayerManager.getPlayers().forEach(p -> PlayerManager.removePlayer(p.getUuid()));
-        PokemonManager.getPokemons().forEach(p -> PokemonManager.removePokemon(p.getUuid()));
     }
 
     @Test
     public void testRegisterManagersLoadsAndLinks() {
-        Player player = PlayerManager.create("integration_player");
+        // Create and persist a player + pokemon with ownership.
+        Player player = PlayerManager.create("integ_player");
         Pokemon pokemon = PokemonManager.create(PokemonType.CHARMANDER, null);
         PokemonManager.setPokemonOwner(pokemon, player);
 
         PlayerFileRepository.save(player);
         PokemonFileRepository.save(pokemon);
 
-        // Clear caches.
-        PlayerManager.getPlayers().forEach(p -> PlayerManager.removePlayer(p.getUuid()));
-        PokemonManager.getPokemons().forEach(p -> PokemonManager.removePokemon(p.getUuid()));
+        // Clear caches to simulate fresh start.
+        clearCaches();
 
         // Now call registerManagers (this will start managers and perform relinking).
         Manager.registerManagers();
 
         // After registration, our persisted entities should be loaded and linked.
-        Player loaded = PlayerManager.getPlayers().stream().filter(pp -> pp.getName().equals("integration_player")).findAny().orElse(null);
-        assertNotNull(loaded);
+        Player loaded = PlayerManager.getPlayers().stream()
+                .filter(pp -> pp.getName().equals("integ_player")).findAny().orElse(null);
+        assertNotNull(loaded, "Player should have been loaded by registerManagers");
 
-        Pokemon loadedPoke = PokemonManager.getPokemons().stream().filter(pp -> pp.getType() == PokemonType.CHARMANDER).findAny().orElse(null);
-        assertNotNull(loadedPoke);
+        Pokemon loadedPoke = PokemonManager.getPokemons().stream()
+                .filter(pp -> pp.getType() == PokemonType.CHARMANDER).findAny().orElse(null);
+        assertNotNull(loadedPoke, "Pokemon should have been loaded by registerManagers");
 
         assertTrue(loaded.hasPokemon(loadedPoke));
         assertEquals(loaded.getUuid(), loadedPoke.getOwnerUuid());

@@ -7,6 +7,7 @@ import me.george.testing.entity.player.PlayerManager;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.entity.pokemon.PokemonType;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,6 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Created by George K. on 2/26/2026.
  */
 public class JsonSerializationTest {
+
+    @AfterEach
+    public void cleanup() {
+        PlayerManager.getPlayers().forEach(p -> PlayerManager.removePlayer(p.getUuid()));
+        PokemonManager.getPokemons().forEach(PokemonManager::removePokemon);
+    }
 
     @Test
     public void testPokemonSerialization() {
@@ -77,6 +84,8 @@ public class JsonSerializationTest {
 
         // activePokemon is @JsonIgnored.
         assertFalse(json.contains("\"activePokemon\""));
+        // The runtime pokemons set should NOT be serialized; only pokemonUuids.
+        assertFalse(json.contains("\"pokemons\""));
     }
 
     @Test
@@ -131,7 +140,7 @@ public class JsonSerializationTest {
     }
 
     @Test
-    public void testPlayerWithPokemonSerialization() {
+    public void testPlayerWithPokemonSerializesUuids() {
         Player player = PlayerManager.create("OwnerTest1");
         Pokemon pokemon = PokemonManager.create(PokemonType.CHARMANDER, null);
         PokemonManager.setPokemonOwner(pokemon, player);
@@ -139,14 +148,16 @@ public class JsonSerializationTest {
         String playerJson = JsonUtil.toJson(player);
         assertNotNull(playerJson);
 
-        // Player should contain the pokemon data in the pokemons set.
-        assertTrue(playerJson.contains("\"pokemons\""));
+        // Player should contain pokemonUuids (not full pokemon objects).
+        assertTrue(playerJson.contains("\"pokemonUuids\""));
+        assertFalse(playerJson.contains("\"pokemons\""));
 
-        // Deserialize and verify.
+        // Deserialize and verify the persisted UUID list.
         Player deserializedPlayer = JsonUtil.fromJson(playerJson, Player.class);
         assertNotNull(deserializedPlayer);
         assertEquals(player.getUuid(), deserializedPlayer.getUuid());
-        assertEquals(1, deserializedPlayer.getPokemons().size());
+        assertEquals(1, deserializedPlayer.getPersistedPokemonUuids().size());
+        assertEquals(pokemon.getUuid(), deserializedPlayer.getPersistedPokemonUuids().get(0));
     }
 
     @Test

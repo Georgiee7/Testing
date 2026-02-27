@@ -10,6 +10,7 @@ import me.george.testing.entity.combatant.stats.PermanentStats;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents an entity that may participate in combat, being a part of Parties.
@@ -29,6 +30,17 @@ public abstract class Combatant extends Entity {
         setAlive(true);
         if (!this.permanentStats.isInitialized())
             calculateStats();
+    }
+
+    /**
+     * Full-args constructor used for Jackson deserialization via subclass @JsonCreator.
+     * Restores all persisted fields without triggering automatic stat calculation or alive defaulting.
+     */
+    protected Combatant(UUID uuid, String name, boolean alive, int health, int exp, int level,
+                        PermanentStats permanentStats, Map<PermanentStat, Integer> evs) {
+        super(uuid, name, alive, health, exp, level);
+        this.permanentStats = permanentStats == null ? new PermanentStats() : permanentStats;
+        this.evs = evs == null ? new HashMap<>() : new HashMap<>(evs);
     }
 
     /**

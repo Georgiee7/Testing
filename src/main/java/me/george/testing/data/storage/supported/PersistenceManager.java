@@ -15,18 +15,19 @@ import java.util.concurrent.TimeUnit;
  * Created by George K. on 2/26/2026.
  */
 public class PersistenceManager extends Manager {
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(r -> {
-        Thread t = new Thread(r, "persistence-manager");
-        t.setDaemon(true);
-        return t;
-    });
-
     private static final int FLUSH_INTERVAL_SECONDS = 30;
+
+    private ScheduledExecutorService scheduler;
 
     @Override
     public void onStart() {
         Testing.logInfo("Starting PersistenceManager (autosave every %ds)...", FLUSH_INTERVAL_SECONDS);
-        SCHEDULER.scheduleAtFixedRate(() -> {
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "persistence-manager");
+            t.setDaemon(true);
+            return t;
+        });
+        this.scheduler.scheduleAtFixedRate(() -> {
             try {
                 flushNow();
             } catch (Throwable th) {
@@ -47,13 +48,18 @@ public class PersistenceManager extends Manager {
     @Override
     public void onStop() {
         Testing.logInfo("Stopping PersistenceManager...");
+        if (this.scheduler == null)
+            return;
+
         try {
-            SCHEDULER.shutdownNow();
-            boolean terminated = SCHEDULER.awaitTermination(5, TimeUnit.SECONDS);
+            this.scheduler.shutdownNow();
+            boolean terminated = this.scheduler.awaitTermination(5, TimeUnit.SECONDS);
             if (!terminated)
                 Testing.warn("PersistenceManager did not terminate within timeout, forcing shutdown.");
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
+        } finally {
+            this.scheduler = null;
         }
     }
 }

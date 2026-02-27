@@ -8,6 +8,7 @@ import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.entity.pokemon.PokemonType;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
@@ -24,37 +25,34 @@ public class ManagerLinkingTest {
     private final Path playersDir = PlayerFileRepository.getDir();
     private final Path pokemonsDir = PokemonFileRepository.getDir();
 
+    @BeforeEach
+    public void setup() throws Exception {
+        // Ensure clean state before each test.
+        clearCaches();
+        deleteDirectory(this.playersDir);
+        deleteDirectory(this.pokemonsDir);
+    }
+
     @AfterEach
     public void cleanup() throws Exception {
-        // Simple recursive delete.
-        if (Files.exists(this.playersDir)) {
-            try (var w = Files.walk(this.playersDir)) {
+        clearCaches();
+        deleteDirectory(this.playersDir);
+        deleteDirectory(this.pokemonsDir);
+    }
+
+    private void clearCaches() {
+        PlayerManager.clearCache();
+        PokemonManager.clearCache();
+    }
+
+    private void deleteDirectory(Path dir) throws Exception {
+        if (Files.exists(dir)) {
+            try (var w = Files.walk(dir)) {
                 w.sorted(Comparator.reverseOrder()).forEach(p -> {
-                    try {
-                        Files.deleteIfExists(p);
-                    } catch (Exception ignored) {
-                    }
+                    try { Files.deleteIfExists(p); } catch (Exception ignored) {}
                 });
             }
         }
-
-        if (Files.exists(this.pokemonsDir)) {
-            try (var w = Files.walk(this.pokemonsDir)) {
-                w.sorted(Comparator.reverseOrder()).forEach(p -> {
-                    try {
-                        Files.deleteIfExists(p);
-                    } catch (Exception ignored) {
-                    }
-                });
-            }
-        }
-
-        // Clear in-memory managers: deleteData removes persisted files as well, ensure we only clear caches.
-        for (Player pl : PlayerManager.getPlayers())
-            PlayerManager.removePlayer(pl.getUuid());
-
-        for (Pokemon pk : PokemonManager.getPokemons())
-            PokemonManager.removePokemon(pk.getUuid());
     }
 
     @Test
@@ -63,34 +61,31 @@ public class ManagerLinkingTest {
         Player player = PlayerManager.create("link_test_player");
         Pokemon pokemon = PokemonManager.create(PokemonType.CHARMANDER, null);
 
-        // set ownership and persist both.
+        // Set ownership and persist both.
         PokemonManager.setPokemonOwner(pokemon, player);
         PlayerFileRepository.save(player);
         PokemonFileRepository.save(pokemon);
 
         // Clear in-memory caches to simulate a fresh start.
-        for (Player p : PlayerManager.getPlayers())
-            PlayerManager.removePlayer(p.getUuid());
-
-        for (Pokemon pk : PokemonManager.getPokemons())
-            PokemonManager.removePokemon(pk.getUuid());
+        clearCaches();
 
         // Load from disk via managers' onStart hooks.
         PlayerManager pm = new PlayerManager();
         PokemonManager pokm = new PokemonManager();
-
         pm.onStart();
         pokm.onStart();
 
-        // perform linking.
+        // Perform linking.
         Manager.relinkPersistentEntities();
 
         // Now the managers' caches should contain the linked objects.
-        Player loadedPlayer = PlayerManager.getPlayers().stream().filter(p -> p.getName().equals("link_test_player")).findAny().orElse(null);
-        assertNotNull(loadedPlayer);
+        Player loadedPlayer = PlayerManager.getPlayers().stream()
+                .filter(p -> p.getName().equals("link_test_player")).findAny().orElse(null);
+        assertNotNull(loadedPlayer, "Player should have been loaded from disk");
 
-        Pokemon loadedPokemon = PokemonManager.getPokemons().stream().filter(p -> p.getType() == PokemonType.CHARMANDER).findAny().orElse(null);
-        assertNotNull(loadedPokemon);
+        Pokemon loadedPokemon = PokemonManager.getPokemons().stream()
+                .filter(p -> p.getType() == PokemonType.CHARMANDER).findAny().orElse(null);
+        assertNotNull(loadedPokemon, "Pokemon should have been loaded from disk");
 
         // The owner should be set and player should have the pokemon in their runtime set.
         assertEquals(loadedPlayer.getUuid(), loadedPokemon.getOwnerUuid());

@@ -44,6 +44,19 @@ public abstract class Pokemon extends Combatant {
         this(type, null);
     }
 
+    /**
+     * Full-args constructor used for Jackson deserialization via subclass @JsonCreator.
+     * Restores all persisted fields without triggering side-effects.
+     */
+    protected Pokemon(UUID uuid, String name, boolean alive, int health, int exp, int level,
+                      PokemonType type, PermanentStats permanentStats, Map<PermanentStat, Integer> evs,
+                      boolean shiny, UUID ownerUuid) {
+        super(uuid, name, alive, health, exp, level, permanentStats, evs);
+        this.type = type;
+        this.shiny = shiny;
+        this.ownerUuid = ownerUuid;
+    }
+
     @JsonProperty("ownerUuid")
     public UUID getOwnerUuid() {
         return (this.owner != null) ? this.owner.getUuid() : this.ownerUuid;
@@ -132,7 +145,7 @@ public abstract class Pokemon extends Combatant {
      * @return isWeakAgainstElement
      */
     public boolean isWeakAgainst(Element element) {
-        return Arrays.stream(getElements()).anyMatch(e -> isWeakAgainst(element));
+        return Arrays.stream(getElements()).anyMatch(e -> e.isWeakAgainst(element));
     }
 
     /**
@@ -142,7 +155,7 @@ public abstract class Pokemon extends Combatant {
      * @return isNormalAgainstElement
      */
     public boolean isNormalAgainst(Element element) {
-        return Arrays.stream(getElements()).anyMatch(e -> isNormalAgainst(element));
+        return Arrays.stream(getElements()).anyMatch(e -> e.isNormalAgainst(element));
     }
 
     @Override

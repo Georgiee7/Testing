@@ -1,5 +1,6 @@
 package me.george.testing.manager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ConcurrentModificationException;
@@ -15,6 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * Created by George K. on 2/26/2026.
  */
 public class ManagerConcurrencyTest {
+
+    @AfterEach
+    public void cleanup() {
+        Manager.clearManagers();
+    }
 
     @Test
     public void stressAddManagersConcurrently() throws InterruptedException {

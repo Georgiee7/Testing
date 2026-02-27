@@ -216,6 +216,15 @@ public class Manager {
     }
 
     /**
+     * Clears all registered managers. Intended for test isolation — allows tests
+     * to reset static state between runs to prevent cross-test contamination.
+     */
+    public static void clearManagers() {
+        managers.clear();
+        INSTANCE_MAP.clear();
+    }
+
+    /**
      * Gets the simple class name of this manager, can be overridden for custom names.
      *
      * @return managerName
