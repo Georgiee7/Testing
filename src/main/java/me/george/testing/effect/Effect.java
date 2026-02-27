@@ -21,7 +21,6 @@ import java.util.Collection;
         @JsonSubTypes.Type(value = Paralysis.class, name = "paralysis")
 })
 public abstract class Effect {
-
     private final EffectType effectType;
 
     @Setter

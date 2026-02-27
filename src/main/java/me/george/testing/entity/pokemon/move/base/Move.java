@@ -25,7 +25,6 @@ import me.george.testing.utils.Utils;
         @JsonSubTypes.Type(value = DebuffMove.class, name = "debuff_move")
 })
 public abstract class Move {
-
     private final MoveType type;
 
     private final String name;

@@ -27,6 +27,7 @@ public class PersistenceManager extends Manager {
             t.setDaemon(true);
             return t;
         });
+
         this.scheduler.scheduleAtFixedRate(() -> {
             try {
                 flushNow();

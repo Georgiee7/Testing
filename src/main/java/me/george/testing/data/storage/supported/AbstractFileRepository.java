@@ -5,6 +5,7 @@ import me.george.testing.data.serialization.JsonUtil;
 import me.george.testing.utils.GeneralException;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -77,7 +78,7 @@ public abstract class AbstractFileRepository<T> {
             Files.writeString(tmp, json, StandardOpenOption.TRUNCATE_EXISTING);
             try {
                 Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (java.nio.file.AtomicMoveNotSupportedException amnse) {
+            } catch (AtomicMoveNotSupportedException amnse) {
                 // fallback.
                 Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
             }

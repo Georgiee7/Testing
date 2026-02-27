@@ -53,9 +53,8 @@ public abstract class TargetMove extends Move {
      */
     public Combatant[] getRandomTargets(int amount) {
         // Make sure the requested amount is not greater than the number of targets
-        if (amount > this.targets.length) {
+        if (amount > this.targets.length)
             throw new IllegalArgumentException("Requested amount exceeds the number of targets");
-        }
 
         shuffleTargets();
         Combatant[] randomTargets = new Combatant[amount];
