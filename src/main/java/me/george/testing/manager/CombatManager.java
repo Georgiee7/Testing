@@ -2,8 +2,8 @@ package me.george.testing.manager;
 
 import me.george.testing.entity.pokemon.Element;
 import me.george.testing.entity.pokemon.Pokemon;
-import me.george.testing.entity.pokemon.move.base.DamagingMove;
 import me.george.testing.entity.pokemon.move.base.Move;
+import me.george.testing.instanced.battle.damage.DamagePipeline;
 
 /**
  * Handles combat related mechanics.
@@ -19,18 +19,21 @@ public class CombatManager extends Manager {
     public static final float DOUBLY_NOT_EFFECTIVE_DAMAGE_MULTIPLIER = .25F;
     public static final float IMMUNE_DAMAGE = 0F;
 
+    public static final float CRITICAL_HIT_MULTIPLIER = 1.5F;
+    public static final int CRITICAL_HIT_CHANCE = 24; // 1 in 24.
+    public static final float MIN_RANDOM_DAMAGE_MULTIPLIER = .85F; // Damage varies between 85% and 100%.
+
     /**
-     * Calculates the damage that a damaging move will deal to a Pokémon.
-     * If the move is not a damaging move, it will return damage equal to 0.
+     * Calculates the damage that a move will deal from one Pokémon to another, with the default damage pipeline.
+     * Battles use their own pipeline, which may have more modifiers. Moves that don't deal damage deal 0.
      *
-     * @param move    The damaging move.
-     * @param pokemon The defending Pokémon.
+     * @param attacker The Pokémon using the move.
+     * @param defender The Pokémon it's used on.
+     * @param move     The move.
      * @return calculatedDamage
      */
-    public static int calculateDamage(Move move, Pokemon pokemon) {
-        return move instanceof DamagingMove
-                ? (int) (((DamagingMove) move).getPower(move.getType()) * calculateEffectivenessModifier(move.getElement(), pokemon.getElements()))
-                : 0;
+    public static int calculateDamage(Pokemon attacker, Pokemon defender, Move move) {
+        return DamagePipeline.createDefault().calculate(attacker, defender, move).getDamage();
     }
 
     /**
