@@ -94,7 +94,7 @@ public abstract class Pokemon extends Combatant {
      * @return isImmuneToElement
      */
     protected boolean isImmuneTo(Element element) {
-        return Arrays.stream(getElements()).anyMatch(e -> e.isImmuneFrom(element));
+        return Arrays.stream(getElements()).anyMatch(element::hasNoEffectOn);
     }
 
     /**

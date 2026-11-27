@@ -36,69 +36,74 @@ public enum Element {
 
     private final Set<Element> effectiveAgainst = new HashSet<>();
     private final Set<Element> weakAgainst = new HashSet<>();
-    private final Set<Element> immuneFrom = new HashSet<>();
+    private final Set<Element> noEffectOn = new HashSet<>();
 
     static {
         initializeElementRelationships();
     }
 
     private static void initializeElementRelationships() {
+        // From the attacking element's side: effective against (2x), weak against (0.5x) and no effect on (0x).
         Element.NORMAL.weakAgainst.addAll(Set.of(Element.ROCK, Element.STEEL));
-        Element.NORMAL.immuneFrom.add(Element.GHOST);
+        Element.NORMAL.noEffectOn.add(Element.GHOST);
 
         Element.FIGHTER.effectiveAgainst.addAll(Set.of(Element.NORMAL, Element.ROCK, Element.STEEL, Element.ICE, Element.DARK));
-        Element.FIGHTER.weakAgainst.addAll(Set.of(Element.FLYING, Element.PSYCHIC, Element.FAIRY));
+        Element.FIGHTER.weakAgainst.addAll(Set.of(Element.FLYING, Element.PSYCHIC, Element.FAIRY, Element.POISON, Element.BUG));
+        Element.FIGHTER.noEffectOn.add(Element.GHOST);
 
         Element.GROUND.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.ELECTRIC, Element.POISON, Element.ROCK, Element.STEEL));
         Element.GROUND.weakAgainst.addAll(Set.of(Element.GRASS, Element.BUG));
-        Element.GROUND.immuneFrom.add(Element.FLYING);
+        Element.GROUND.noEffectOn.add(Element.FLYING);
 
         Element.ROCK.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.ICE, Element.FLYING, Element.BUG));
-        Element.ROCK.weakAgainst.addAll(Set.of(Element.WATER, Element.GRASS, Element.FIGHTER, Element.GROUND));
+        Element.ROCK.weakAgainst.addAll(Set.of(Element.FIGHTER, Element.GROUND, Element.STEEL));
 
         Element.STEEL.effectiveAgainst.addAll(Set.of(Element.ICE, Element.ROCK, Element.FAIRY));
-        Element.STEEL.weakAgainst.addAll(Set.of(Element.FIRE, Element.FIGHTER, Element.GROUND));
+        Element.STEEL.weakAgainst.addAll(Set.of(Element.FIRE, Element.WATER, Element.ELECTRIC, Element.STEEL));
 
         Element.FLYING.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.FIGHTER, Element.BUG));
-        Element.FLYING.weakAgainst.addAll(Set.of(Element.ELECTRIC, Element.ICE, Element.ROCK));
+        Element.FLYING.weakAgainst.addAll(Set.of(Element.ELECTRIC, Element.ROCK, Element.STEEL));
 
         Element.DRAGON.effectiveAgainst.add(Element.DRAGON);
         Element.DRAGON.weakAgainst.add(Element.STEEL);
+        Element.DRAGON.noEffectOn.add(Element.FAIRY);
 
         Element.FIRE.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.ICE, Element.BUG, Element.STEEL));
         Element.FIRE.weakAgainst.addAll(Set.of(Element.WATER, Element.ROCK, Element.FIRE, Element.DRAGON));
 
         Element.ELECTRIC.effectiveAgainst.addAll(Set.of(Element.WATER, Element.FLYING));
         Element.ELECTRIC.weakAgainst.addAll(Set.of(Element.ELECTRIC, Element.GRASS, Element.DRAGON));
-        Element.ELECTRIC.immuneFrom.add(Element.GROUND);
+        Element.ELECTRIC.noEffectOn.add(Element.GROUND);
 
         Element.WATER.effectiveAgainst.addAll(Set.of(Element.FIRE, Element.GROUND, Element.ROCK));
-        Element.WATER.weakAgainst.addAll(Set.of(Element.GRASS, Element.ELECTRIC));
+        Element.WATER.weakAgainst.addAll(Set.of(Element.WATER, Element.GRASS, Element.DRAGON));
 
         Element.ICE.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.GROUND, Element.FLYING, Element.DRAGON));
-        Element.ICE.weakAgainst.addAll(Set.of(Element.FIRE, Element.FIGHTER, Element.ROCK, Element.STEEL));
+        Element.ICE.weakAgainst.addAll(Set.of(Element.FIRE, Element.WATER, Element.ICE, Element.STEEL));
 
         Element.GRASS.effectiveAgainst.addAll(Set.of(Element.WATER, Element.GROUND, Element.ROCK));
-        Element.GRASS.weakAgainst.addAll(Set.of(Element.FIRE, Element.GRASS, Element.POISON, Element.FLYING, Element.BUG));
+        Element.GRASS.weakAgainst.addAll(Set.of(Element.FIRE, Element.GRASS, Element.POISON, Element.FLYING, Element.BUG, Element.DRAGON, Element.STEEL));
 
         Element.DARK.effectiveAgainst.addAll(Set.of(Element.PSYCHIC, Element.GHOST));
         Element.DARK.weakAgainst.addAll(Set.of(Element.FIGHTER, Element.DARK, Element.FAIRY));
 
         Element.PSYCHIC.effectiveAgainst.addAll(Set.of(Element.FIGHTER, Element.POISON));
-        Element.PSYCHIC.weakAgainst.addAll(Set.of(Element.BUG, Element.GHOST, Element.DARK));
+        Element.PSYCHIC.weakAgainst.addAll(Set.of(Element.PSYCHIC, Element.STEEL));
+        Element.PSYCHIC.noEffectOn.add(Element.DARK);
 
         Element.GHOST.effectiveAgainst.addAll(Set.of(Element.GHOST, Element.PSYCHIC));
         Element.GHOST.weakAgainst.add(Element.DARK);
-        Element.GHOST.immuneFrom.add(Element.NORMAL);
+        Element.GHOST.noEffectOn.add(Element.NORMAL);
 
         Element.BUG.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.PSYCHIC, Element.DARK));
-        Element.BUG.weakAgainst.addAll(Set.of(Element.FIRE, Element.FIGHTER, Element.FLYING, Element.STEEL));
+        Element.BUG.weakAgainst.addAll(Set.of(Element.FIRE, Element.FIGHTER, Element.FLYING, Element.STEEL, Element.POISON, Element.GHOST, Element.FAIRY));
 
         Element.POISON.effectiveAgainst.addAll(Set.of(Element.GRASS, Element.FAIRY));
         Element.POISON.weakAgainst.addAll(Set.of(Element.POISON, Element.GROUND, Element.ROCK, Element.GHOST));
+        Element.POISON.noEffectOn.add(Element.STEEL);
 
         Element.FAIRY.effectiveAgainst.addAll(Set.of(Element.FIGHTER, Element.DRAGON, Element.DARK));
-        Element.FAIRY.weakAgainst.addAll(Set.of(Element.POISON, Element.STEEL));
+        Element.FAIRY.weakAgainst.addAll(Set.of(Element.FIRE, Element.POISON, Element.STEEL));
     }
 
     /**
@@ -131,13 +136,13 @@ public enum Element {
     }
 
     /**
-     * Whether this element is immune against another type of element.
+     * Whether this element has no effect on another type of element, meaning the other one is immune to it.
      *
      * @param other The other element in question.
-     * @return isImmune
+     * @return hasNoEffect
      */
-    public boolean isImmuneFrom(Element other) {
-        return this.immuneFrom.contains(other);
+    public boolean hasNoEffectOn(Element other) {
+        return this.noEffectOn.contains(other);
     }
 
     /**
@@ -147,7 +152,7 @@ public enum Element {
      * @return isNormal
      */
     public boolean isNormalAgainst(Element other) {
-        return this == other || !this.effectiveAgainst.contains(other) && !this.weakAgainst.contains(other);
+        return !isEffectiveAgainst(other) && !isWeakAgainst(other) && !hasNoEffectOn(other);
     }
 
     /**
@@ -161,10 +166,8 @@ public enum Element {
             return CombatManager.EFFECTIVE_DAMAGE_MULTIPLIER;
         else if (isWeakAgainst(other))
             return CombatManager.NOT_EFFECTIVE_DAMAGE_MULTIPLIER;
-        else if (isImmuneFrom(other))
+        else if (hasNoEffectOn(other))
             return CombatManager.IMMUNE_DAMAGE;
-        else if (isNormalAgainst(other))
-            return CombatManager.NORMAL_DAMAGE_MULTIPLIER;
 
         return CombatManager.NORMAL_DAMAGE_MULTIPLIER;
     }
