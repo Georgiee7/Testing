@@ -53,7 +53,7 @@ public class Testing {
     }
 
     private static void info(String message) {
-        System.out.printf(message + "\n");
+        System.out.println(message);
     }
 
     /**
