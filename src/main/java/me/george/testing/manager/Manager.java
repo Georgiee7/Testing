@@ -38,39 +38,51 @@ public class Manager {
     }
 
     /**
-     * Register managers.
+     * Register managers. A manager is registered after the managers it uses, so it starts after them and stops before them.
      */
     private static void register() {
         addManager(PokemonManager.class);
         addManager(PlayerManager.class);
         addManager(CombatManager.class);
-        addManager(BattleManager.class);
         addManager(BattleEventManager.class);
+        addManager(BattleManager.class); // Battles call events, so they're stopped while the listeners are still there.
         addManager(PartyManager.class);
     }
 
     /**
-     * Enables all managers after registering them, executing their starting hook.
+     * Enables all managers after registering them, executing their starting hook in the order they were registered.
+     * A manager failing to start is logged, and doesn't stop the managers after it from starting.
      */
     public static void registerManagers() {
         Testing.logInfo("Registering managers...");
         register();
         for (Manager manager : getManagers()) {
             manager.log("Enabling...");
-            manager.onStart();
+            try {
+                manager.onStart();
+            } catch (Exception exception) {
+                Testing.handleError(exception, "%s failed to start.", manager.getName());
+            }
         }
 
         Testing.logInfo("Registered %d managers.", getManagers().size());
     }
 
     /**
-     * Disables all managers after executing their disabling hook.
+     * Disables all managers after executing their disabling hook, in the reverse order they were registered.
+     * A manager failing to stop is logged, and doesn't stop the managers after it from stopping.
      */
     public static void disableManagers() {
         Testing.logInfo("Disabling managers...");
-        for (Manager manager : getManagers()) {
+        List<Manager> registered = getManagers();
+        for (int i = registered.size() - 1; i >= 0; i--) {
+            Manager manager = registered.get(i);
             manager.log("Disabling...");
-            manager.onStop();
+            try {
+                manager.onStop();
+            } catch (Exception exception) {
+                Testing.handleError(exception, "%s failed to stop.", manager.getName());
+            }
         }
 
         Testing.logInfo("Managers have been disabled.");
