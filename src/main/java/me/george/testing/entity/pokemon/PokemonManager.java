@@ -95,6 +95,16 @@ public class PokemonManager extends Manager {
         updatePokemon(pokemon, p -> p.setName(name));
     }
 
+    /**
+     * Sets whether a Pokémon is shiny.
+     *
+     * @param pokemon The Pokémon to update.
+     * @param shiny   Whether it should be shiny.
+     */
+    public static void setShiny(Pokemon pokemon, boolean shiny) {
+        updatePokemon(pokemon, p -> p.setShiny(shiny));
+    }
+
     private static void updatePokemon(Pokemon pokemon, Consumer<Pokemon> callback) {
         Utils.verifyNotNull(pokemon, "Cannot update a null pokemon.");
         callback.accept(pokemon);

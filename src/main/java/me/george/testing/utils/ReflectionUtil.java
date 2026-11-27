@@ -52,6 +52,54 @@ public class ReflectionUtil {
     }
 
     /**
+     * Gets the fields of a class and of the classes above it that are marked with an annotation, made accessible.
+     * Static fields are left out. This scans the class every time, so callers should keep the result.
+     *
+     * @param clazz      The class whose fields to get.
+     * @param annotation The annotation the fields are marked with.
+     * @return annotatedFields
+     */
+    public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotation) {
+        Utils.verifyNotNull(clazz, "Tried to get the fields of a null class.");
+        List<Field> fields = new ArrayList<>();
+        for (Class<?> current = clazz; current != null && current != Object.class; current = current.getSuperclass()) {
+            for (Field field : current.getDeclaredFields()) {
+                if (!field.isAnnotationPresent(annotation) || Modifier.isStatic(field.getModifiers()))
+                    continue;
+
+                field.setAccessible(true);
+                fields.add(field);
+            }
+        }
+
+        return fields;
+    }
+
+    /**
+     * Gets the class of a field's generic argument, which is otherwise erased. For a List&lt;String&gt; field, argument 0 is String.
+     *
+     * @param field The field.
+     * @param index The index of the generic argument.
+     * @return argumentClass
+     */
+    public static Class<?> getGenericArgument(Field field, int index) {
+        Utils.verifyNotNull(field, "Tried to get a generic argument of a null field.");
+        if (field.getGenericType() instanceof ParameterizedType parameterizedType) {
+            Type[] arguments = parameterizedType.getActualTypeArguments();
+            if (index >= 0 && index < arguments.length) {
+                Type argument = arguments[index];
+                if (argument instanceof Class<?> argumentClass)
+                    return argumentClass;
+
+                if (argument instanceof ParameterizedType parameterizedArgument)
+                    return (Class<?>) parameterizedArgument.getRawType();
+            }
+        }
+
+        throw new GeneralException("%s#%s has no generic argument %d that is a class.", Utils.getSimpleName(field.getDeclaringClass()), field.getName(), index);
+    }
+
+    /**
      * Gets a method handle of a method, even a private one. Unlike Method#invoke, calling it throws the method's own
      * exceptions instead of wrapping them, and it's faster once made, so callers should keep it.
      *

@@ -5,6 +5,7 @@ import lombok.Setter;
 import me.george.testing.entity.player.Player;
 import me.george.testing.entity.pokemon.Pokemon;
 import me.george.testing.entity.pokemon.PokemonManager;
+import me.george.testing.entity.pokemon.spec.PokemonSpec;
 import me.george.testing.utils.Utils;
 
 import java.util.Collection;
@@ -32,6 +33,10 @@ public class PokemonBox {
     @Getter
     @Setter
     private PokemonSorter sorter = PokemonSorter.DEFAULT;
+
+    @Getter
+    @Setter
+    private PokemonSpec search; // Only shows the Pokémon matching it, such as "*[level>=30]". Null to search nothing.
 
     public PokemonBox(Player owner, Supplier<Collection<Pokemon>> source) {
         Utils.verifyNotNull(source, "Tried to create a Pokemon box with no source.");
@@ -83,6 +88,9 @@ public class PokemonBox {
     }
 
     private boolean applyFilters(Pokemon pokemon) {
+        if (this.search != null && !this.search.matches(pokemon))
+            return false;
+
         for (PokemonFilter filter : PokemonFilter.values())
             if (!filter.filter(this.owner, pokemon, this.filterSettings[filter.ordinal()]))
                 return false;

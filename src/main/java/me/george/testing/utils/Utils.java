@@ -516,6 +516,24 @@ public class Utils {
     }
 
     /**
+     * Gets an enum's value by its name, ignoring case.
+     *
+     * @param name      The name of the value.
+     * @param enumClass The enum's class.
+     * @return enumValue, or null if there's none with that name.
+     */
+    public static <E extends Enum<E>> E getEnum(String name, Class<E> enumClass) {
+        if (name == null)
+            return null;
+
+        try {
+            return Enum.valueOf(enumClass, name.trim().toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
+    /**
      * Gets the following enum value, or the first one if it's the last.
      *
      * @param value The earlier value.
