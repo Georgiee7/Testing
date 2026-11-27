@@ -2,6 +2,7 @@ package me.george.testing.entity.pokemon;
 
 import lombok.Getter;
 import me.george.testing.entity.combatant.stats.PermanentStats;
+import me.george.testing.entity.pokemon.types.SimplePokemon;
 import me.george.testing.entity.pokemon.types.t1.fire.Charmander;
 import me.george.testing.entity.combatant.stats.PermanentStat;
 
@@ -269,7 +270,7 @@ public enum PokemonType {
         this.baseStats = baseStats;
         this.height = height;
         this.weight = weight;
-        this.maker = maker;
+        this.maker = maker != null ? maker : stats -> new SimplePokemon(this, stats); // Types without their own class yet.
         this.evolutions = evolutions;
         this.elements = elements;
     }

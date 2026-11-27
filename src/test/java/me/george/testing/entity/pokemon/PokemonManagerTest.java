@@ -31,6 +31,16 @@ public class PokemonManagerTest {
     }
 
     @Test
+    public void testCreateEveryType() {
+        for (PokemonType type : PokemonType.values()) {
+            Pokemon pokemon = PokemonManager.create(type, null);
+            assertEquals(type, pokemon.getType());
+            assertEquals(pokemon.getHP(), pokemon.getHealth());
+            PokemonManager.removePokemon(pokemon);
+        }
+    }
+
+    @Test
     public void testSetPokemonOwner() {
         PokemonManager.setPokemonOwner(MOCK_POKEMON, MOCK_PLAYER);
         assertEquals(MOCK_PLAYER, MOCK_POKEMON.getOwner());
