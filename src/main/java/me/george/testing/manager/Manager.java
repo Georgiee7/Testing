@@ -1,6 +1,7 @@
 package me.george.testing.manager;
 
 import me.george.testing.Testing;
+import me.george.testing.challenge.ChallengeManager;
 import me.george.testing.entity.player.PlayerManager;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.instanced.battle.BattleManager;
@@ -45,6 +46,7 @@ public class Manager {
         addManager(PlayerManager.class);
         addManager(CombatManager.class);
         addManager(BattleEventManager.class);
+        addManager(ChallengeManager.class);
         addManager(BattleManager.class); // Battles call events, so they're stopped while the listeners are still there.
         addManager(PartyManager.class);
     }
