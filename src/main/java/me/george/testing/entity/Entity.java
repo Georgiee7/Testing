@@ -54,15 +54,18 @@ public abstract class Entity {
     public abstract boolean save();
 
     /**
-     * Sets this entity's health, killing it if below 0.
+     * Sets this entity's health, killing it if at or below 0. Giving a dead entity health revives it.
      *
      * @param amount The amount of health to set it at.
      */
     public void setHealth(int amount) {
-        if (amount <= 0)
+        if (amount <= 0) {
             kill();
-        else
-            this.health = amount;
+            return;
+        }
+
+        this.health = amount;
+        this.alive = true;
     }
 
     /**

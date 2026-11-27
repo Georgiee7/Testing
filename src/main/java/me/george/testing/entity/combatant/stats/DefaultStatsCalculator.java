@@ -1,7 +1,6 @@
 package me.george.testing.entity.combatant.stats;
 
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Default implementation of the stats calculator.
@@ -10,21 +9,11 @@ import java.util.Random;
 public class DefaultStatsCalculator implements StatsCalculator {
 
     @Override
-    public void calculate(PermanentStats target, int totalEVs, Map<PermanentStat, Integer> baseStats, int level, Random rng) {
-        int remainingEVs = Math.min(totalEVs, PermanentStats.MAX_EV_AMOUNT_PER_POKEMON);
+    public void calculate(PermanentStats target, Map<PermanentStat, Integer> baseStats, Map<PermanentStat, Integer> ivs, Map<PermanentStat, Integer> evs, int level) {
         for (PermanentStat stat : PermanentStat.values()) {
-            int maxEVForStat = Math.min(remainingEVs, PermanentStats.MAX_EV_AMOUNT_PER_STAT);
-            int evForStat = (maxEVForStat > 0) ? rng.nextInt(maxEVForStat + 1) : 0;
-
-            target.statsPut(stat, baseStats.getOrDefault(stat, PermanentStats.MIN_BASE_STAT));
-            target.increaseStat(stat, evForStat);
-            remainingEVs -= evForStat;
-        }
-
-        for (PermanentStat stat : PermanentStat.values()) {
-            int iv = rng.nextInt(PermanentStats.MIN_IV_ROLL, PermanentStats.MAX_IV_ROLL + 1);
-            int baseStat = target.getStat(stat);
-            int ev = target.getStat(stat) - PermanentStats.MIN_BASE_STAT;
+            int baseStat = baseStats.getOrDefault(stat, PermanentStats.MIN_BASE_STAT);
+            int iv = ivs.getOrDefault(stat, PermanentStats.MIN_IV_ROLL);
+            int ev = evs.getOrDefault(stat, PermanentStats.MIN_EV_AMOUNT);
 
             if (stat == PermanentStat.HP)
                 target.setStat(stat, DefaultStatsCalculator.calculateHPStat(baseStat, iv, ev, level));

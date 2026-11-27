@@ -31,6 +31,7 @@ public abstract class Pokemon extends Combatant {
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         super(type.getName(), permanentStats);
         this.type = type;
+        initializeStats();
     }
 
     protected Pokemon(PokemonType type) {
@@ -44,8 +45,11 @@ public abstract class Pokemon extends Combatant {
 
     @Override
     public void levelUp() {
+        int previousHP = getHP();
         super.levelUp();
         calculateStats();
+        if (isAlive())
+            setHealth(getHealth() + getHP() - previousHP); // Keeps the damage taken, like the games do.
     }
 
     @Override

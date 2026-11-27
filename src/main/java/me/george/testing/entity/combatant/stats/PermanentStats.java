@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A wrapper around permanent stats a combatant may have.
@@ -17,6 +15,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class PermanentStats {
     public static final int MIN_BASE_STAT = 5;
     public static final int MAX_BASE_STAT = 255;
+
+    // Calculated stats go well past the base stat cap, a level 100 Pokémon with 255 base health has over 700 health.
+    public static final int MIN_STAT = 1;
+    public static final int MAX_STAT = 999;
 
     public static final int MIN_EV_AMOUNT = 0;
     public static final int MAX_EV_AMOUNT_PER_STAT = 252;
@@ -53,7 +55,7 @@ public class PermanentStats {
      * @return statValue
      */
     public int getStat(PermanentStat stat) {
-        return this.stats.getOrDefault(stat, MIN_BASE_STAT);
+        return this.stats.getOrDefault(stat, MIN_STAT);
     }
 
     /**
@@ -63,8 +65,7 @@ public class PermanentStats {
      * @param value The value to update it with.
      */
     public void setStat(PermanentStat stat, int value) {
-        int newValue = Math.min(value, MAX_BASE_STAT);
-        this.stats.put(stat, Math.max(newValue, MIN_BASE_STAT));
+        this.stats.put(stat, clampStat(value));
     }
 
     /**
@@ -74,55 +75,29 @@ public class PermanentStats {
      * @param value The value to increase it by.
      */
     public void increaseStat(PermanentStat stat, int value) {
-        int newValue = Math.min(getStat(stat) + value, MAX_BASE_STAT);
-        this.stats.put(stat, Math.max(newValue, MIN_BASE_STAT));
+        setStat(stat, getStat(stat) + value);
     }
 
     /**
-     * Decreases a specific stat by a value, up to 0.
+     * Decreases a specific stat by a value, down to its minimum.
      *
      * @param stat  The stat to decrease.
      * @param value The value to decrease it by.
      */
     public void decreaseStat(PermanentStat stat, int value) {
-        int newValue = Math.max(getStat(stat) - value, MIN_BASE_STAT);
-        this.stats.put(stat, Math.min(newValue, MAX_BASE_STAT));
+        setStat(stat, getStat(stat) - value);
     }
 
     /**
      * Calculate stats using the configured calculator.
      *
-     * @param totalEVs  The total EVs to account for in the calculation.
      * @param baseStats Base stats to use in the formula.
+     * @param ivs       The IVs per stat to use in the formula.
+     * @param evs       The EVs per stat to use in the formula.
      * @param level     The level to be used to calculate the bonus.
      */
-    public void calculateStats(int totalEVs, Map<PermanentStat, Integer> baseStats, int level) {
-        calculateStats(totalEVs, baseStats, level, ThreadLocalRandom.current());
-    }
-
-    /**
-     * Calculate stats using the configured calculator.
-     *
-     * @param totalEVs  The total EVs to account for in the calculation.
-     * @param baseStats Base stats to use in the formula.
-     * @param level     The level to be used to calculate the bonus.
-     * @param rng       The random number generator to use for IV rolls.
-     */
-    public void calculateStats(int totalEVs, Map<PermanentStat, Integer> baseStats, int level, Random rng) {
-        // Validate and clamp EVs before handing over to the calculator.
-        int clampedEVs = clampTotalEVs(totalEVs);
-        this.calculator.calculate(this, clampedEVs, baseStats, level, rng);
-    }
-
-    /**
-     * Convenience overload to match existing external usage that passes a Map of EVs per stat.
-     *
-     * @param totalEVs  Map of EVs per stat to account for.
-     * @param baseStats Base stats to use in the formula.
-     * @param level     The level to be used to calculate the bonus.
-     */
-    public void calculateStats(Map<PermanentStat, Integer> totalEVs, Map<PermanentStat, Integer> baseStats, int level) {
-        calculateStats(totalEVs.values().stream().mapToInt(Integer::intValue).sum(), baseStats, level);
+    public void calculateStats(Map<PermanentStat, Integer> baseStats, Map<PermanentStat, Integer> ivs, Map<PermanentStat, Integer> evs, int level) {
+        this.calculator.calculate(this, baseStats, ivs, evs, level);
     }
 
     /**
@@ -137,10 +112,8 @@ public class PermanentStats {
      */
     public void fromMap(Map<PermanentStat, Integer> map) {
         this.stats.clear();
-        for (PermanentStat s : PermanentStat.values()) {
-            int v = map.getOrDefault(s, MIN_BASE_STAT);
-            this.stats.put(s, Math.max(MIN_BASE_STAT, Math.min(MAX_BASE_STAT, v)));
-        }
+        for (PermanentStat s : PermanentStat.values())
+            this.stats.put(s, clampStat(map.getOrDefault(s, MIN_STAT)));
 
         this.initialized = !this.stats.isEmpty();
     }
@@ -167,18 +140,7 @@ public class PermanentStats {
         this.initialized = value;
     }
 
-    private int clampTotalEVs(int evs) {
-        if (evs < MIN_EV_AMOUNT)
-            return 0;
-
-        return Math.min(evs, MAX_EV_AMOUNT_PER_POKEMON);
-    }
-
-    private static int calculateHPStat(int baseStat, int iv, int ev, int level) {
-        return ((2 * baseStat + iv + ev / 4) * level) / 100 + level + 10;
-    }
-
-    private static int calculateOtherStat(int baseStat, int iv, int ev, int level) {
-        return ((2 * baseStat + iv + ev / 4) * level) / 100 + 5;
+    private static int clampStat(int value) {
+        return Math.max(MIN_STAT, Math.min(MAX_STAT, value));
     }
 }
