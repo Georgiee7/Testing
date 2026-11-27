@@ -29,7 +29,7 @@ public class CombatManager extends Manager {
      */
     public static int calculateDamage(Move move, Pokemon pokemon) {
         return move instanceof DamagingMove
-                ? (int) (((DamagingMove) move).calculateDamage(move.getType()) * calculateEffectivenessModifier(move.getElement(), pokemon.getElements()))
+                ? (int) (((DamagingMove) move).getPower(move.getType()) * calculateEffectivenessModifier(move.getElement(), pokemon.getElements()))
                 : 0;
     }
 

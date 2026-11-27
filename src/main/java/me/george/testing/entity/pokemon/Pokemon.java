@@ -7,9 +7,14 @@ import me.george.testing.entity.combatant.Combatant;
 import me.george.testing.entity.combatant.stats.PermanentStat;
 import me.george.testing.entity.combatant.stats.PermanentStats;
 import me.george.testing.entity.player.Player;
+import me.george.testing.entity.pokemon.move.MoveType;
+import me.george.testing.utils.Utils;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -20,7 +25,11 @@ import java.util.stream.Collectors;
 public abstract class Pokemon extends Combatant {
     private static final int[] EXP_REQUIREMENTS = new int[PokemonManager.MAX_LEVEL]; // Shared by all Pokémon, filled in as levels are reached.
 
+    public static final int MAX_MOVES = 4;
+
     private final PokemonType type;
+
+    private final List<MoveType> moves;
 
     @Setter(AccessLevel.PROTECTED)
     private boolean shiny = false;
@@ -31,6 +40,7 @@ public abstract class Pokemon extends Combatant {
     protected Pokemon(PokemonType type, PermanentStats permanentStats) {
         super(type.getName(), permanentStats);
         this.type = type;
+        this.moves = new CopyOnWriteArrayList<>(MoveType.getStartingMoves(type.getElements()));
         initializeStats();
     }
 
@@ -89,6 +99,59 @@ public abstract class Pokemon extends Combatant {
      */
     public Element[] getElements() {
         return this.type.getElements();
+    }
+
+    /**
+     * Whether this Pokémon has an element.
+     *
+     * @param element The element in question.
+     * @return hasElement
+     */
+    public boolean hasElement(Element element) {
+        return Utils.contains(getElements(), element);
+    }
+
+    /**
+     * Gets the moves this Pokémon knows.
+     *
+     * @return moves
+     */
+    public List<MoveType> getMoves() {
+        return Collections.unmodifiableList(this.moves);
+    }
+
+    /**
+     * Teaches this Pokémon a move, if it doesn't know it and knows less than the maximum.
+     *
+     * @param move The move to learn.
+     * @return learnedMove
+     */
+    public boolean learnMove(MoveType move) {
+        Utils.verifyNotNull(move, "Tried to teach a Pokemon a null move.");
+        if (this.moves.size() >= MAX_MOVES || this.moves.contains(move))
+            return false;
+
+        return this.moves.add(move);
+    }
+
+    /**
+     * Makes this Pokémon forget a move.
+     *
+     * @param move The move to forget.
+     * @return forgotMove
+     */
+    public boolean forgetMove(MoveType move) {
+        return this.moves.remove(move);
+    }
+
+    /**
+     * Picks the move to use on its turn.
+     * Placeholder; picks at random, a player's Pokémon would be told which one by its player.
+     *
+     * @return chosenMove
+     */
+    public MoveType chooseMove() {
+        return this.moves.isEmpty() ? MoveType.TACKLE : Utils.randElement(this.moves);
     }
 
     /**

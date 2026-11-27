@@ -9,12 +9,13 @@ import me.george.testing.entity.pokemon.move.MoveType;
 public interface DamagingMove extends AccuracyMove {
 
     /**
-     * Calculates the amount of damage the move should do. Defaults to its base damage.
+     * Gets the power of the move, the base of the damage it deals. Defaults to its type's power,
+     * can be overridden for moves whose power changes (such as ones that get stronger at low health).
      *
-     * @param moveType The move to calculate the damage of.
-     * @return calculatedMoveDamage
+     * @param moveType The move to get the power of.
+     * @return movePower
      */
-    default int calculateDamage(MoveType moveType) {
-        return Math.max(moveType.getBaseDamage(), 0);
+    default int getPower(MoveType moveType) {
+        return Math.max(moveType.getPower(), 0);
     }
 }
