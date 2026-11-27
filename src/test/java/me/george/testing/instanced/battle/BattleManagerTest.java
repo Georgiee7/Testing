@@ -16,11 +16,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -90,6 +93,48 @@ public class BattleManagerTest {
     public void testStopBattle() {
         BattleManager.stop(MOCK_BATTLE);
         assertTrue(MOCK_BATTLE.isFinished() || !MOCK_BATTLE.isActive() || MOCK_BATTLE == null); // Accounting for various possible definitions of a "stopped battle".
+    }
+
+    @Test
+    public void testStoppingAFinishedBattleDoesNothing() {
+        BattleManager.finish(MOCK_BATTLE);
+        assertDoesNotThrow(() -> BattleManager.stop(MOCK_BATTLE));
+    }
+
+    @Test
+    public void testFinishedBattleIsUncached() {
+        assertTrue(BattleManager.getBattles().contains(MOCK_BATTLE));
+        BattleManager.finish(MOCK_BATTLE);
+        assertFalse(BattleManager.getBattles().contains(MOCK_BATTLE));
+    }
+
+    @Test
+    public void testWinner() {
+        BattleManager.finish(MOCK_BATTLE); // Player 1's party has 2 alive combatants, player 2's has 1.
+        assertEquals(MOCK_PLAYER_1_PARTY, MOCK_BATTLE.getWinner());
+        assertFalse(MOCK_BATTLE.isDraw());
+    }
+
+    @Test
+    public void testDraw() {
+        Party party1 = PartyManager.createParty(new ArrayList<>(List.of(PlayerManager.create("DRAW_PLAYER1"))), Set.of(PokemonManager.create(PokemonType.CHARMANDER, null)));
+        Party party2 = PartyManager.createParty(new ArrayList<>(List.of(PlayerManager.create("DRAW_PLAYER2"))), Set.of(PokemonManager.create(PokemonType.CHARMANDER, null)));
+
+        Battle battle = BattleManager.createBattle(Arrays.asList(party1, party2));
+        BattleManager.finish(battle);
+        assertTrue(battle.isDraw());
+        assertNull(battle.getWinner());
+    }
+
+    @Test
+    public void testBattleEndsWhenAPartyIsDefeated() {
+        BattleManager.start(MOCK_BATTLE);
+        MOCK_PLAYER_2_TEAM.forEach(Combatant::kill);
+
+        BattleManager.pause(MOCK_BATTLE);
+        BattleManager.resume(MOCK_BATTLE); // Resuming processes the next turn, which notices player 2's party is out.
+        assertTrue(MOCK_BATTLE.isFinished());
+        assertEquals(MOCK_PLAYER_1_PARTY, MOCK_BATTLE.getWinner());
     }
 
     @AfterAll

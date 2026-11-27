@@ -75,11 +75,15 @@ public class Battle implements InstancedScenario {
 
     @Override
     public void finish() {
+        if (isFinished())
+            return; // Finishing twice (such as stopping a battle that just ended) does nothing.
+
         this.winner = calculateWinner();
         if (this.winner == null)
             this.draw = true;
 
         setState(State.FINISHED);
+        BattleManager.removeBattle(this);
         log((!this.draw ? "Battle finished with winning party:\n" + this.winner.getMembers()
                 .stream()
                 .map(Entity::getName)
@@ -89,65 +93,75 @@ public class Battle implements InstancedScenario {
     }
 
     private void initializeTurnQueue() {
-        this.parties.stream().map(Party::getMembers).forEach(this.turnQueue::addAll);
+        this.parties.stream().map(Party::getCombatants).forEach(this.turnQueue::addAll); // Only combatants take turns, players command them.
     }
 
     private void processNextTurn() {
         if (!isFinished()) {
-            Entity attacker = this.turnQueue.poll();
+            Entity attacker = pollNextAttacker();
             Entity defender = getRandomOpponent(attacker); // Placeholder; a normal battle would include some sort of targeting system like targeting the lowest HP opponent first. This should obviously not deal with the active player's turn, they're supposed to play themselves.
             if (attacker != null && defender != null) {
                 // TODO: Handle attack between attacker and defender.
                 Testing.logInfo(attacker.getName() + " attacked " + defender.getName()); // debug
                 this.currentTurn = new Turn(attacker, defender);
                 this.pastTurns.add(this.currentTurn);
+                this.turnQueue.add(attacker); // Back of the queue for its next turn.
             }
 
             checkBattleStatus();
         }
     }
 
+    // Gets the next alive combatant in the queue, dropping the dead ones.
+    private Entity pollNextAttacker() {
+        Entity attacker = this.turnQueue.poll();
+        while (attacker != null && !attacker.isAlive())
+            attacker = this.turnQueue.poll();
+
+        return attacker;
+    }
+
     private void checkBattleStatus() {
-        for (Party party : this.parties) {
-            if (party.getMembers().isEmpty()) {
-                this.winner = party;
-                finish();
-                break;
-            }
-        }
+        long partiesStanding = this.parties.stream().filter(party -> countAliveCombatants(party) > 0).count();
+        if (partiesStanding <= 1)
+            finish();
     }
 
     private Entity getRandomOpponent(Entity entity) {
-        Party opponentParty = this.parties.stream()
+        if (entity == null)
+            return null;
+
+        List<Entity> opponents = this.parties.stream()
                 .filter(party -> !party.isMember(entity))
-                .findAny()
-                .orElse(null);
+                .flatMap(party -> party.getCombatants().stream())
+                .filter(Entity::isAlive)
+                .toList();
 
-        if (opponentParty != null) {
-            List<Entity> opponentEntities = opponentParty.getMembers();
-            return Utils.randElement(opponentEntities);
-        }
-
-        return null;
+        return opponents.isEmpty() ? null : Utils.randElement(opponents);
     }
 
     /**
      * Calculates the battle's winning party based on the number of alive combatants.
+     * Returns null for a draw, when no party has more alive combatants than all the others.
      *
      * @return winningParty
      */
     protected Party calculateWinner() {
         Party winningParty = null;
-        int maxAliveCombatants = Integer.MIN_VALUE;
+        int maxAliveCombatants = 0;
+        boolean tied = false;
         for (Party party : this.parties) {
             int aliveCombatants = countAliveCombatants(party);
             if (aliveCombatants > maxAliveCombatants) {
                 maxAliveCombatants = aliveCombatants;
                 winningParty = party;
+                tied = false;
+            } else if (aliveCombatants == maxAliveCombatants) {
+                tied = true;
             }
         }
 
-        return winningParty;
+        return tied ? null : winningParty;
     }
 
     /**

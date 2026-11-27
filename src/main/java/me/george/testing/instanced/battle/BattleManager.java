@@ -85,21 +85,30 @@ public class BattleManager extends Manager {
     }
 
     /**
-     * Sets a battle to a finished state.
+     * Sets a battle to a finished state. Does nothing if it already finished.
      *
      * @param battle The battle to finish.
      */
     public static void finish(Battle battle) {
-        updateBattle(battle, Battle::finish);
+        endBattle(battle, Battle::finish);
     }
 
     /**
-     * Stops a battle immediately calling its stop hook.
+     * Stops a battle immediately calling its stop hook. Does nothing if it already finished.
      *
      * @param battle The battle to stop.
      */
     public static void stop(Battle battle) {
-        updateBattle(battle, Battle::stop);
+        endBattle(battle, Battle::stop);
+    }
+
+    /**
+     * Removes a battle from the cache, called by the battle itself once it finishes.
+     *
+     * @param battle The battle to remove.
+     */
+    static void removeBattle(Battle battle) {
+        CACHED_BATTLES.remove(battle.getUuid());
     }
 
     private static void updateBattle(Battle battle, Consumer<Battle> battleConsumer) {
@@ -108,6 +117,13 @@ public class BattleManager extends Manager {
         Utils.verify(!battle.isFinished(), "Tried to update a finished battle.");
 
         battleConsumer.accept(battle);
+    }
+
+    // Ending a battle that already ended does nothing, since a battle can end on its own at any turn.
+    private static void endBattle(Battle battle, Consumer<Battle> battleConsumer) {
+        Utils.verifyNotNull(battle, "Tried to end an invalid battle.");
+        if (!battle.isFinished())
+            battleConsumer.accept(battle);
     }
 
     /**
