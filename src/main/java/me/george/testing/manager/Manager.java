@@ -4,6 +4,7 @@ import me.george.testing.Testing;
 import me.george.testing.entity.player.PlayerManager;
 import me.george.testing.entity.pokemon.PokemonManager;
 import me.george.testing.instanced.battle.BattleManager;
+import me.george.testing.instanced.battle.event.BattleEventManager;
 import me.george.testing.parties.PartyManager;
 import me.george.testing.utils.ReflectionUtil;
 import me.george.testing.utils.Utils;
@@ -44,6 +45,7 @@ public class Manager {
         addManager(PlayerManager.class);
         addManager(CombatManager.class);
         addManager(BattleManager.class);
+        addManager(BattleEventManager.class);
         addManager(PartyManager.class);
     }
 
