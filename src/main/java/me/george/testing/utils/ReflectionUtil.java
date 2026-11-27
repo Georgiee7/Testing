@@ -2,7 +2,17 @@ package me.george.testing.utils;
 
 import me.george.testing.Testing;
 
+import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,6 +48,23 @@ public class ReflectionUtil {
         } catch (Throwable th) {
             Testing.warn("Could not construct %s, does it have a no-args constructor?", clazz.getSimpleName());
             throw new GeneralException(th, "Could not construct %s, does it have a no-args constructor?", clazz.getSimpleName());
+        }
+    }
+
+    /**
+     * Gets a method handle of a method, even a private one. Unlike Method#invoke, calling it throws the method's own
+     * exceptions instead of wrapping them, and it's faster once made, so callers should keep it.
+     *
+     * @param method The method to get a handle of.
+     * @return methodHandle
+     */
+    public static MethodHandle unreflect(Method method) {
+        Utils.verifyNotNull(method, "Tried to get a handle of a null method.");
+        try {
+            method.setAccessible(true);
+            return MethodHandles.lookup().unreflect(method);
+        } catch (Throwable th) {
+            throw new GeneralException(th, "Could not access %s#%s.", Utils.getSimpleName(method.getDeclaringClass()), method.getName());
         }
     }
 }
