@@ -516,6 +516,46 @@ public class Utils {
     }
 
     /**
+     * Gets the following enum value, or the first one if it's the last.
+     *
+     * @param value The earlier value.
+     * @return nextEnumValue
+     */
+    public static <E extends Enum<E>> E nextEnumLoop(E value) {
+        verifyNotNull(value, "Cannot get the next value of a null enum.");
+        E[] values = value.getDeclaringClass().getEnumConstants();
+        return values[(value.ordinal() + 1) % values.length];
+    }
+
+    /**
+     * Gets the previous enum value, or the last one if it's the first.
+     *
+     * @param value The later value.
+     * @return previousEnumValue
+     */
+    public static <E extends Enum<E>> E previousEnumLoop(E value) {
+        verifyNotNull(value, "Cannot get the previous value of a null enum.");
+        E[] values = value.getDeclaringClass().getEnumConstants();
+        return values[(value.ordinal() - 1 + values.length) % values.length];
+    }
+
+    /**
+     * Gets the following value in an enum's values, null after the last one and the first one after null.
+     * Useful for cycling through settings that have an extra "none/all" value, which null stands for.
+     * The values must be all the enum's values in order, as returned by values().
+     *
+     * @param values All the enum's values.
+     * @param value  The earlier value, may be null.
+     * @return nextEnumValueOrNull
+     */
+    public static <E extends Enum<?>> E nextEnumOrNullLoop(E[] values, E value) {
+        if (value == null)
+            return values.length > 0 ? values[0] : null;
+
+        return value.ordinal() + 1 < values.length ? values[value.ordinal() + 1] : null;
+    }
+
+    /**
      * Returns if the number provided is negative or not.
      *
      * @param num The number to test.

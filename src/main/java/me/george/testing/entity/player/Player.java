@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Represents a player that can own Pokémon slaves.
+ * Represents a player that can own Pokémon.
  * Created by George K. on 4/14/2024.
  */
 @Getter
