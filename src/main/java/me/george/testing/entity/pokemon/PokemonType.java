@@ -19,9 +19,9 @@ public enum PokemonType {
     IVYSAUR(2, "Ivysaur", baseStats(60, 62, 63, 80, 80, 60), 1.0F, 13.0F, null, evolutionsOf(VENUSAUR), Element.GRASS, Element.POISON),
     BULBASAUR(1, "Bulbasaur", baseStats(45, 49, 49, 65, 65, 45), 0.7F, 6.9F, null, evolutionsOf(IVYSAUR), Element.GRASS, Element.POISON),
 
-    CHARIZARD(6, "Charizard", baseStats(78, 84, 78, 109, 85, 100), 1.7F, 90F, null, evolutionsOf(), Element.FIRE, Element.DRAGON),
-    CHARMANDER(4, "Charmander", baseStats(39, 52, 43, 60, 50, 65), 0.6F, 8.5F, Charmander::new, evolutionsOf(CHARIZARD), Element.FIRE),
+    CHARIZARD(6, "Charizard", baseStats(78, 84, 78, 109, 85, 100), 1.7F, 90F, null, evolutionsOf(), Element.FIRE, Element.FLYING),
     CHARMELEON(5, "Charmeleon", baseStats(58, 64, 58, 80, 65, 80), 1.1F, 19.0F, null, evolutionsOf(CHARIZARD), Element.FIRE),
+    CHARMANDER(4, "Charmander", baseStats(39, 52, 43, 60, 50, 65), 0.6F, 8.5F, Charmander::new, evolutionsOf(CHARMELEON), Element.FIRE),
 
     BLASTOISE(9, "Blastoise", baseStats(79, 83, 100, 85, 105, 78), 1.6F, 85.5F, null, evolutionsOf(), Element.WATER),
     WARTORTLE(8, "Wartortle", baseStats(59, 63, 80, 65, 80, 58), 1.0F, 22.5F, null, evolutionsOf(BLASTOISE), Element.WATER),

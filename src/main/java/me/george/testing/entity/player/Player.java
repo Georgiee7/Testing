@@ -19,6 +19,8 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Getter
 public class Player extends Entity {
+    private static final int[] EXP_REQUIREMENTS = new int[PlayerManager.MAX_LEVEL]; // Shared by all players, filled in as levels are reached.
+
     private final Set<Pokemon> pokemons;
 
     private final ConcurrentMap<Integer, PokemonType> pokedex;
@@ -39,7 +41,7 @@ public class Player extends Entity {
 
     @Override
     protected int[] getCachedExpRequirement() {
-        return new int[PlayerManager.MAX_LEVEL];
+        return EXP_REQUIREMENTS;
     }
 
     @Override
@@ -82,7 +84,9 @@ public class Player extends Entity {
      * @param pokemon The pokemon to remove.
      */
     public void removePokemon(Pokemon pokemon) {
-        despawnActivePokemon();
+        if (pokemon.equals(this.activePokemon))
+            despawnActivePokemon();
+
         this.pokemons.remove(pokemon);
     }
 

@@ -43,13 +43,13 @@ public abstract class Move {
      * @return moveSuccessfullyPerformed
      */
     public final boolean perform() {
-        return execute() && rollSuccessRate();
+        return rollSuccessRate() && execute(); // Roll first, so a failed move doesn't do anything.
         // calculateAccuracy();
         // TODO: Cater to mechanics that may cause a move to fail (randomness involved in moves, lack of skill, etc.).
     }
 
     private boolean rollSuccessRate() {
-        return Utils.randFloat(this.successRate, 100F) >= this.successRate;
+        return Utils.randChancePercent(this.successRate);
     }
 
     /**

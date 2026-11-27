@@ -561,6 +561,17 @@ public class Utils {
     }
 
     /**
+     * Random percentage chance based on 0-100, allowing decimals (such as 12.5%).
+     * Supplying 100 or more always returns true, and 0 or less never does.
+     *
+     * @param chance The chance between 0 and 100.
+     * @return randChance
+     */
+    public static boolean randChancePercent(float chance) {
+        return randFloat(0F, 100F) < chance;
+    }
+
+    /**
      * Gets an input and turns it into a percent
      *
      * @param input to be turned int percent

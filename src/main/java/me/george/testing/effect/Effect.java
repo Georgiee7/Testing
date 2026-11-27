@@ -38,6 +38,6 @@ public abstract class Effect {
      * @return effectSuccessfullyExecuted
      */
     public final boolean execute(Collection<Combatant> receivers) {
-        return (Utils.randChance(this.procChance) && perform(receivers));
+        return (Utils.randChancePercent(this.procChance) && perform(receivers));
     }
 }

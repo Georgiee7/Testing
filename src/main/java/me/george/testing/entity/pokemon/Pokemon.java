@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
  */
 @Getter
 public abstract class Pokemon extends Combatant {
+    private static final int[] EXP_REQUIREMENTS = new int[PokemonManager.MAX_LEVEL]; // Shared by all Pokémon, filled in as levels are reached.
+
     private final PokemonType type;
 
     @Setter(AccessLevel.PROTECTED)
@@ -68,7 +70,7 @@ public abstract class Pokemon extends Combatant {
 
     @Override
     protected int[] getCachedExpRequirement() {
-        return new int[PokemonManager.MAX_LEVEL];
+        return EXP_REQUIREMENTS;
     }
 
     @Override
@@ -112,7 +114,7 @@ public abstract class Pokemon extends Combatant {
      * @return isWeakAgainstElement
      */
     public boolean isWeakAgainst(Element element) {
-        return Arrays.stream(getElements()).anyMatch(e -> isWeakAgainst(element));
+        return Arrays.stream(getElements()).anyMatch(e -> e.isWeakAgainst(element));
     }
 
     /**
@@ -122,7 +124,7 @@ public abstract class Pokemon extends Combatant {
      * @return isNormalAgainstElement
      */
     public boolean isNormalAgainst(Element element) {
-        return Arrays.stream(getElements()).anyMatch(e -> isNormalAgainst(element));
+        return Arrays.stream(getElements()).anyMatch(e -> e.isNormalAgainst(element));
     }
 
     @Override

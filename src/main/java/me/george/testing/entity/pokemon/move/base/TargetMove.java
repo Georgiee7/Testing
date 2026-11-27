@@ -18,7 +18,7 @@ public abstract class TargetMove extends Move {
 
     protected TargetMove(MoveType type, Combatant caster, Combatant... targets) {
         super(type, caster);
-        this.targets = targets;
+        this.targets = targets == null ? new Combatant[0] : targets.clone(); // Copied, since picking random targets shuffles them.
     }
 
     @Override
